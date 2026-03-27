@@ -36,7 +36,7 @@ php bin/devbot run
 
 See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for development conventions.
 
-## Current State: Phase 2
+## Current State: Phase 3
 
 ### Phase 1 — Foundation
 - Symfony 8.x with symfony/ai (dev-main) and symfony/tui (fabpot PR #63778)
@@ -54,10 +54,17 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - MemoryInjectionProcessor auto-injects relevant context before each agent call
 - RuleBasedImportanceScorer for heuristic memory scoring
 
+### Phase 3 — Kanban + Git
+- Kanban board with JSON persistence (Board, Column, Card models with WIP limits)
+- KanbanManager for CRUD with automatic save
+- 4 kanban tools: kanban_list, kanban_create_card, kanban_move_card, kanban_update_card
+- 2 git tools: git_status (status/log/diff/branch), git_commit (stage + commit)
+- 16 total agent tools registered
+
 ### Vendor Patches
 - `patches/ollama-ndjson-streaming.patch` — OllamaClient uses NdjsonHttpResult (PR #1827)
 - `patches/platform-ndjson-result.patch` — adds NdjsonHttpResult class for NDJSON streaming
 
 ### Quality
 - PHPStan level 6: 0 errors
-- 18 unit tests passing
+- 25 unit tests passing

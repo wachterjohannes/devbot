@@ -44,6 +44,20 @@ services:
     devbot.http_client.amp:
         class: Symfony\Component\HttpClient\AmpHttpClient
 
+    # Kanban Manager
+    App\Kanban\KanbanManager:
+        arguments:
+            $boardFile: '%kernel.project_dir%/kanban/board.json'
+
+    # Git tools
+    App\Tool\Git\GitStatusTool:
+        arguments:
+            $workingDirectory: '%devbot.shell.working_directory%'
+
+    App\Tool\Git\GitCommitTool:
+        arguments:
+            $workingDirectory: '%devbot.shell.working_directory%'
+
     # Memory injection processor
     App\Agent\Processor\MemoryInjectionProcessor:
         arguments:
