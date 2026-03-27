@@ -70,6 +70,9 @@
             },
             "symfony/ai-platform": {
                 "Add NdjsonHttpResult for NDJSON streaming (PR #1827)": "patches/platform-ndjson-result.patch"
+            },
+            "symfony/ai-bundle": {
+                "TraceableStore implements ManagedStoreInterface (PR #1828)": "patches/ai-bundle-traceable-store-managed.patch"
             }
         }
     },

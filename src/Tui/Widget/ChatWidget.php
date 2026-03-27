@@ -8,6 +8,7 @@ use Revolt\EventLoop;
 use Symfony\AI\Agent\AgentInterface;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
+use Symfony\AI\Platform\Bridge\Ollama\OllamaMessageChunk;
 use Symfony\Component\Tui\Event\SubmitEvent;
 use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\EditorWidget;
@@ -104,17 +105,40 @@ final class ChatWidget
     private function streamResponse(\Generator $chunks): void
     {
         $fullResponse = '';
+        $isThinking = true;
+        $thinkingDots = 0;
         $this->conversationLog .= "\n\nDevBot: ";
 
         foreach ($chunks as $chunk) {
-            $text = (string) $chunk;
+            if ($chunk instanceof OllamaMessageChunk) {
+                $thinking = $chunk->getThinking();
+                $content = $chunk->getContent();
 
-            if ($text === '') {
-                continue;
+                if ($thinking !== null && $thinking !== '') {
+                    // Still in thinking phase — animate dots
+                    if ($isThinking && ++$thinkingDots % 5 === 0) {
+                        $dots = str_repeat('.', ($thinkingDots / 5 % 3) + 1);
+                        $this->updateOutput($this->conversationLog . "thinking" . $dots);
+                    }
+
+                    continue;
+                }
+
+                if ($content !== null && $content !== '') {
+                    if ($isThinking) {
+                        $isThinking = false;
+                    }
+
+                    $fullResponse .= $content;
+                    $this->updateOutput($this->conversationLog . $fullResponse);
+                }
+            } else {
+                $text = (string) $chunk;
+                if ($text !== '') {
+                    $fullResponse .= $text;
+                    $this->updateOutput($this->conversationLog . $fullResponse);
+                }
             }
-
-            $fullResponse .= $text;
-            $this->updateOutput($this->conversationLog . $fullResponse);
         }
 
         if ($fullResponse === '') {

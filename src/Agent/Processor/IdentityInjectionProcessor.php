@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Agent\Processor;
 
 use App\Identity\IdentityManager;
+use Symfony\AI\Agent\Attribute\AsInputProcessor;
 use Symfony\AI\Agent\Input;
 use Symfony\AI\Agent\InputProcessorInterface;
 use Symfony\AI\Platform\Message\Message;
@@ -13,6 +14,7 @@ use Symfony\AI\Platform\Message\Message;
  * Injects SOUL, IDENTITY, and active human profile into the agent's system context.
  * Runs before every agent call to give the bot its personality and awareness.
  */
+#[AsInputProcessor(agent: 'ai.agent.devbot', priority: -35)]
 final readonly class IdentityInjectionProcessor implements InputProcessorInterface
 {
     public function __construct(
@@ -46,8 +48,11 @@ final readonly class IdentityInjectionProcessor implements InputProcessorInterfa
         $contextBlock = "# Identity Context\n\n" . implode("\n\n---\n\n", $parts);
 
         $messageBag = $input->getMessageBag();
+        $existing = $messageBag->getSystemMessage();
+        $prefix = $existing !== null ? $existing->getContent() . "\n\n" : '';
+
         $input->setMessageBag(
-            $messageBag->withSystemMessage(Message::forSystem($contextBlock)),
+            $messageBag->withSystemMessage(Message::forSystem($prefix . $contextBlock)),
         );
     }
 }

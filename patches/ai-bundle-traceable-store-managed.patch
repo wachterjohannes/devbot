@@ -1,0 +1,47 @@
+--- a/src/Profiler/TraceableStore.php	2026-03-27 22:30:11
++++ b/src/Profiler/TraceableStore.php	2026-03-27 22:30:40
+@@ -12,6 +12,7 @@
+ namespace Symfony\AI\AiBundle\Profiler;
+ 
+ use Symfony\AI\Store\Document\VectorDocument;
++use Symfony\AI\Store\ManagedStoreInterface;
+ use Symfony\AI\Store\Query\QueryInterface;
+ use Symfony\AI\Store\StoreInterface;
+ use Symfony\Component\Clock\ClockInterface;
+@@ -30,7 +31,7 @@
+  *     called_at: \DateTimeImmutable,
+  * }
+  */
+-final class TraceableStore implements StoreInterface, ResetInterface
++final class TraceableStore implements StoreInterface, ManagedStoreInterface, ResetInterface
+ {
+     /**
+      * @var StoreData[]
+@@ -43,6 +44,13 @@
+     ) {
+     }
+ 
++    public function setup(array $options = []): void
++    {
++        if ($this->store instanceof ManagedStoreInterface) {
++            $this->store->setup($options);
++        }
++    }
++
+     public function add(VectorDocument|array $documents): void
+     {
+         $this->calls[] = [
+@@ -83,6 +91,13 @@
+         return $this->store->supports($queryClass);
+     }
+ 
++    public function drop(array $options = []): void
++    {
++        if ($this->store instanceof ManagedStoreInterface) {
++            $this->store->drop($options);
++        }
++    }
++
+     public function reset(): void
+     {
+         $this->calls = [];

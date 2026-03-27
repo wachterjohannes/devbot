@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Agent\Processor;
 
 use App\Memory\MemoryManager;
+use Symfony\AI\Agent\Attribute\AsInputProcessor;
 use Symfony\AI\Agent\Input;
 use Symfony\AI\Agent\InputProcessorInterface;
 use Symfony\AI\Platform\Message\Content\Text;
@@ -16,6 +17,7 @@ use Symfony\AI\Platform\Message\UserMessage;
  * Uses a lightweight semantic search to find baseline context without the agent
  * explicitly searching. The agent can still use memory tools for deeper exploration.
  */
+#[AsInputProcessor(agent: 'ai.agent.devbot', priority: -40)]
 final readonly class MemoryInjectionProcessor implements InputProcessorInterface
 {
     public function __construct(

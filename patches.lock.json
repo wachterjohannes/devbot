@@ -1,5 +1,5 @@
 {
-    "_hash": "51681cad6e7282f1b9c4bf7a97629f9de9ed4c1fda0d9aa1a9b3cad230a61de5",
+    "_hash": "59e4d13423b6af58bc7ac070f4d7bd28ff66c1e3a072318a94488c8e9fd3e3de",
     "patches": {
         "symfony/ai-ollama-platform": [
             {
@@ -19,6 +19,18 @@
                 "description": "Add NdjsonHttpResult for NDJSON streaming (PR #1827)",
                 "url": "patches/platform-ndjson-result.patch",
                 "sha256": "6a65367ee5f60088bda88d925d56fb9da396e6fb72ccd6af4025bcaaa73dab94",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "symfony/ai-bundle": [
+            {
+                "package": "symfony/ai-bundle",
+                "description": "TraceableStore implements ManagedStoreInterface (PR #1828)",
+                "url": "patches/ai-bundle-traceable-store-managed.patch",
+                "sha256": "071badbde259d10d98aa0d61181745017c165ac8281c5982cbb7cb0494eed777",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"
