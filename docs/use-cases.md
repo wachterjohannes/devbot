@@ -116,3 +116,51 @@ Skills can reference other tools, creating complex workflows:
 > "Create a skill that does a weekly code quality check: run git status, check the kanban board for stale in-progress cards older than 3 days, and store a report in memory"
 
 The agent follows the steps using `git_status`, `kanban_list`, date arithmetic, and `memory_add`. The heartbeat runs it every Monday at 9:00.
+
+## Claude Code Delegation
+
+### Architecture Planning
+
+> "Analyze the current codebase and propose an architecture for adding webhook support"
+
+DevBot delegates to Claude Code in **plan mode** (read-only). Claude reads the codebase, understands the patterns, and returns a detailed architecture proposal — without modifying any files.
+
+### Code Implementation
+
+> "Implement the webhook listener based on the plan we just discussed"
+
+DevBot delegates in **dev mode** (acceptEdits). Claude Code creates files, modifies existing code, and runs tests. The result is returned to DevBot's chat.
+
+### Code Review
+
+> "Review the changes in src/Kanban/ for potential issues"
+
+Plan mode again — Claude reads the code, analyzes patterns, checks for bugs, and reports findings without touching anything.
+
+### Refactoring with Context
+
+> "Refactor the memory stores to use a common interface. Here's the context: we have ShortTermStore, LongTermStore, EpisodicStore, and SemanticStore."
+
+DevBot passes the task plus context to Claude Code in dev mode. Claude understands the full picture and makes coordinated changes across files.
+
+### Quick Fixes with Haiku
+
+> "Add the missing return type to SkillParser::extractName — use haiku, it's a simple fix"
+
+For trivial changes, DevBot can delegate to the `haiku` model — faster and cheaper than sonnet/opus.
+
+### Deep Analysis with Opus
+
+> "Use opus to analyze our memory system's scalability characteristics and suggest improvements for 100k+ entries"
+
+For complex reasoning tasks, DevBot can specify the `opus` model for maximum capability.
+
+### Combined Workflows
+
+> "Create a skill that every Friday at 17:00 asks Claude to review all commits from this week and store a summary in memory"
+
+A heartbeat skill that:
+1. Uses `git_status` to get the week's commit log
+2. Delegates to Claude Code (plan mode) for analysis
+3. Stores the review in memory via `memory_add`
+4. Creates a kanban card if issues were found
