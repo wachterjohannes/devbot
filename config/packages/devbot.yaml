@@ -1,0 +1,10 @@
+parameters:
+    devbot.model.primary: 'kimi-k2.5:cloud'
+    devbot.model.embedding: 'nomic-embed-text'
+    devbot.identity.soul_file: '%kernel.project_dir%/identity/SOUL.md'
+    devbot.identity.identity_file: '%kernel.project_dir%/identity/IDENTITY.md'
+    devbot.identity.humans_dir: '%kernel.project_dir%/identity/humans'
+    devbot.web.ollama_api_key: '%env(OLLAMA_API_KEY)%'
+    devbot.web.search_max_results: 5
+    devbot.web.fetch_timeout: 15
+    devbot.shell.working_directory: '%env(default::DEVBOT_WORKDIR)%'

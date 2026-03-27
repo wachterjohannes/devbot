@@ -1,0 +1,73 @@
+{
+    "name": "devbot/devbot",
+    "description": "AI-powered development process agent built on Symfony/TUI and Symfony/AI",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "league/commonmark": "^2.8",
+        "symfony/ai-agent": "dev-main as 0.6.99",
+        "symfony/ai-bundle": "dev-main as 0.6.99",
+        "symfony/ai-chat": "dev-main as 0.6.99",
+        "symfony/ai-claude-code-platform": "dev-main as 0.6.99",
+        "symfony/ai-clock-tool": "dev-main as 0.6.99",
+        "symfony/ai-filesystem-tool": "dev-main as 0.6.99",
+        "symfony/ai-ollama-platform": "dev-main as 0.6.99",
+        "symfony/ai-platform": "dev-main as 0.6.99",
+        "symfony/ai-sqlite-store": "dev-main as 0.6.99",
+        "symfony/ai-store": "dev-main as 0.6.99",
+        "symfony/console": "^8.0",
+        "symfony/dependency-injection": "^8.0",
+        "symfony/dotenv": "^8.0",
+        "symfony/event-dispatcher": "^8.0",
+        "symfony/framework-bundle": "^8.0",
+        "symfony/http-client": "^8.0",
+        "symfony/mcp-bundle": "dev-main as 0.6.99",
+        "symfony/runtime": "^8.0",
+        "symfony/tui": "@dev",
+        "symfony/yaml": "^8.0",
+        "tempest/highlight": "^2.17"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5",
+        "phpstan/phpstan": "^2.1",
+        "friendsofphp/php-cs-fixer": "^3.75"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "lib/tui"
+        }
+    ],
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        }
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan analyse",
+        "lint": "php-cs-fixer fix",
+        "lint-check": "php-cs-fixer fix --dry-run --diff"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,24 @@
+ai:
+    platform:
+        ollama:
+            endpoint: '%env(OLLAMA_HOST_URL)%'
+
+    agent:
+        devbot:
+            platform: 'ai.platform.ollama'
+            model: 'kimi-k2.5:cloud'
+            prompt:
+                file: '%kernel.project_dir%/config/prompts/devbot_system.md'
+                include_tools: true
+            tools: true
+            fault_tolerant_toolbox: true
+
+    store:
+        sqlite:
+            memory_store:
+                dsn: 'sqlite:///%kernel.project_dir%/var/devbot_memory.sqlite'
+
+    vectorizer:
+        ollama_embeddings:
+            platform: 'ai.platform.ollama'
+            model: 'nomic-embed-text'

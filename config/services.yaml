@@ -1,0 +1,23 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Kernel.php'
+
+    # Identity Manager
+    App\Identity\IdentityManager:
+        arguments:
+            $soulFile: '%devbot.identity.soul_file%'
+            $identityFile: '%devbot.identity.identity_file%'
+            $humansDir: '%devbot.identity.humans_dir%'
+
+    # Ollama Web Bridge (for web search/fetch tools)
+    App\Bridge\OllamaWebBridge:
+        arguments:
+            $apiKey: '%devbot.web.ollama_api_key%'
+            $searchMaxResults: '%devbot.web.search_max_results%'
+            $fetchTimeout: '%devbot.web.fetch_timeout%'
