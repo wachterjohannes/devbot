@@ -11,7 +11,7 @@ use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\ContainerWidget;
 
 /**
- * Root TUI application. Sets up the layout with chat panel and status bar.
+ * Root TUI application. Lays out: chat output (expands) + editor (fixed) + status bar.
  *
  * Phase 1: Single-tab chat interface.
  * Phase 4 adds tabs (Board, Memory, Logs).
@@ -28,17 +28,22 @@ final class App
         $tui = new Tui();
 
         $chat = new ChatWidget($this->agent);
-        $chat->setId('chat');
-        $chat->expandVertically(true);
-
-        $statusBar = new StatusBarWidget();
-        $statusBar->setId('status-bar');
 
         $layout = new ContainerWidget();
         $layout->setId('main-layout');
         $layout->expandVertically(true);
-        $layout->add($chat);
-        $layout->add($statusBar);
+
+        // Output area — wrapped in expanding container to fill available space
+        $outputContainer = new ContainerWidget();
+        $outputContainer->setId('output-container');
+        $outputContainer->expandVertically(true);
+        $outputContainer->add($chat->getOutput());
+
+        $layout->add($outputContainer);
+        $layout->add($chat->getEditor());
+        $layout->add(new StatusBarWidget());
+
+        $chat->setTui($tui);
 
         $tui->add($layout);
         $tui->quitOn('ctrl+q');

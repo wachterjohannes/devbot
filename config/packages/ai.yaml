@@ -2,6 +2,7 @@ ai:
     platform:
         ollama:
             endpoint: '%env(OLLAMA_HOST_URL)%'
+            http_client: 'devbot.http_client.amp'
 
     agent:
         devbot:

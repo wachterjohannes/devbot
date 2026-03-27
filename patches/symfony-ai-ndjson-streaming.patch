@@ -1,0 +1,369 @@
+diff --git a/src/platform/src/Bridge/Ollama/OllamaClient.php b/src/platform/src/Bridge/Ollama/OllamaClient.php
+index c5c89a5988..8fc94453bd 100644
+--- a/src/platform/src/Bridge/Ollama/OllamaClient.php
++++ b/src/platform/src/Bridge/Ollama/OllamaClient.php
+@@ -15,7 +15,9 @@
+ use Symfony\AI\Platform\Exception\InvalidArgumentException;
+ use Symfony\AI\Platform\Model;
+ use Symfony\AI\Platform\ModelClientInterface;
++use Symfony\AI\Platform\Result\NdjsonHttpResult;
+ use Symfony\AI\Platform\Result\RawHttpResult;
++use Symfony\AI\Platform\Result\RawResultInterface;
+ use Symfony\AI\Platform\StructuredOutput\PlatformSubscriber;
+ use Symfony\Contracts\HttpClient\HttpClientInterface;
+ 
+@@ -50,7 +52,7 @@ public function supports(Model $model): bool
+         return $model instanceof Ollama;
+     }
+ 
+-    public function request(Model $model, array|string $payload, array $options = []): RawHttpResult
++    public function request(Model $model, array|string $payload, array $options = []): RawResultInterface
+     {
+         return match (true) {
+             $model->supports(Capability::INPUT_MESSAGES) => $this->doCompletionRequest($payload, $options),
+@@ -63,7 +65,7 @@ public function request(Model $model, array|string $payload, array $options = []
+      * @param array<string|int, mixed> $payload
+      * @param array<string, mixed>     $options
+      */
+-    private function doCompletionRequest(array|string $payload, array $options = []): RawHttpResult
++    private function doCompletionRequest(array|string $payload, array $options = []): RawResultInterface
+     {
+         if (\is_string($payload)) {
+             throw new InvalidArgumentException(\sprintf('Payload must be an array, but a string was given to "%s".', self::class));
+@@ -79,10 +81,12 @@ private function doCompletionRequest(array|string $payload, array $options = [])
+ 
+         $options = $this->normalizeOllamaOptions($options, self::CHAT_TOP_LEVEL_KEYS);
+ 
+-        return new RawHttpResult($this->httpClient->request('POST', '/api/chat', [
++        $response = $this->httpClient->request('POST', '/api/chat', [
+             'headers' => ['Content-Type' => 'application/json'],
+             'json' => array_merge($options, $payload),
+-        ]));
++        ]);
++
++        return new NdjsonHttpResult($response, $this->httpClient);
+     }
+ 
+     /**
+diff --git a/src/platform/src/Bridge/Ollama/Tests/OllamaClientTest.php b/src/platform/src/Bridge/Ollama/Tests/OllamaClientTest.php
+index c794fb1606..7c14982955 100644
+--- a/src/platform/src/Bridge/Ollama/Tests/OllamaClientTest.php
++++ b/src/platform/src/Bridge/Ollama/Tests/OllamaClientTest.php
+@@ -18,6 +18,7 @@
+ use Symfony\AI\Platform\Bridge\Ollama\PlatformFactory;
+ use Symfony\AI\Platform\Capability;
+ use Symfony\AI\Platform\Model;
++use Symfony\AI\Platform\Result\NdjsonHttpResult;
+ use Symfony\AI\Platform\Result\RawHttpResult;
+ use Symfony\AI\Platform\Result\StreamResult;
+ use Symfony\AI\Platform\StructuredOutput\PlatformSubscriber;
+@@ -96,18 +97,16 @@ public function testStreamingIsSupported()
+             new JsonMockResponse([
+                 'capabilities' => ['completion'],
+             ]),
+-            new MockResponse('data: '.json_encode([
+-                'model' => 'llama3.2',
+-                'created_at' => '2025-08-23T10:00:00Z',
+-                'message' => ['role' => 'assistant', 'content' => 'Hello world'],
+-                'done' => true,
+-                'prompt_eval_count' => 10,
+-                'eval_count' => 10,
+-            ])."\n\n", [
+-                'response_headers' => [
+-                    'content-type' => 'text/event-stream',
+-                ],
+-            ]),
++            new MockResponse(
++                json_encode([
++                    'model' => 'llama3.2',
++                    'created_at' => '2025-08-23T10:00:00Z',
++                    'message' => ['role' => 'assistant', 'content' => 'Hello world'],
++                    'done' => true,
++                    'prompt_eval_count' => 10,
++                    'eval_count' => 10,
++                ])."\n",
++            ),
+         ], 'http://127.0.0.1:1234');
+ 
+         $platform = PlatformFactory::create('http://127.0.0.1:1234', httpClient: $httpClient);
+@@ -132,29 +131,25 @@ public function testStreamingIsSupported()
+ 
+     public function testStreamingConverterWithDirectResponse()
+     {
+-        $streamingData = 'data: '.json_encode([
++        $streamingData = json_encode([
+             'model' => 'llama3.2',
+             'created_at' => '2025-08-23T10:00:00Z',
+             'message' => ['role' => 'assistant', 'content' => 'Hello'],
+             'done' => false,
+-        ])."\n\n".
+-        'data: '.json_encode([
++        ])."\n".
++        json_encode([
+             'model' => 'llama3.2',
+             'created_at' => '2025-08-23T10:00:01Z',
+             'message' => ['role' => 'assistant', 'content' => ' world'],
+             'done' => true,
+-        ])."\n\n";
++        ])."\n";
+ 
+         $mockHttpClient = new MockHttpClient([
+-            new MockResponse($streamingData, [
+-                'response_headers' => [
+-                    'content-type' => 'text/event-stream',
+-                ],
+-            ]),
++            new MockResponse($streamingData),
+         ]);
+ 
+         $mockResponse = $mockHttpClient->request('GET', 'http://test.example');
+-        $rawResult = new RawHttpResult($mockResponse);
++        $rawResult = new NdjsonHttpResult($mockResponse, $mockHttpClient);
+         $converter = new OllamaResultConverter();
+ 
+         $result = $converter->convert($rawResult, ['stream' => true]);
+@@ -171,7 +166,7 @@ public function testStreamingConverterWithDirectResponse()
+         ]);
+ 
+         $regularMockResponse = $regularMockHttpClient->request('GET', 'http://test.example');
+-        $regularRawResult = new RawHttpResult($regularMockResponse);
++        $regularRawResult = new NdjsonHttpResult($regularMockResponse, $regularMockHttpClient);
+         $regularResult = $converter->convert($regularRawResult, ['stream' => false]);
+ 
+         $this->assertNotInstanceOf(StreamResult::class, $regularResult);
+diff --git a/src/platform/src/Result/NdjsonHttpResult.php b/src/platform/src/Result/NdjsonHttpResult.php
+new file mode 100644
+index 0000000000..f2ce1c46f2
+--- /dev/null
++++ b/src/platform/src/Result/NdjsonHttpResult.php
+@@ -0,0 +1,74 @@
++<?php
++
++/*
++ * This file is part of the Symfony package.
++ *
++ * (c) Fabien Potencier <fabien@symfony.com>
++ *
++ * For the full copyright and license information, please view the LICENSE
++ * file that was distributed with this source code.
++ */
++
++namespace Symfony\AI\Platform\Result;
++
++use Symfony\Contracts\HttpClient\HttpClientInterface;
++use Symfony\Contracts\HttpClient\ResponseInterface;
++
++/**
++ * Handles NDJSON (Newline Delimited JSON) streaming responses.
++ *
++ * Unlike SSE-based streaming (handled by RawHttpResult), NDJSON sends one
++ * complete JSON object per line, separated by newlines. This is the format
++ * used by Ollama's /api/chat endpoint when streaming.
++ *
++ * @author Johannes Wachter <johannes@sulu.io>
++ */
++final class NdjsonHttpResult implements RawResultInterface
++{
++    public function __construct(
++        private readonly ResponseInterface $response,
++        private readonly HttpClientInterface $httpClient,
++    ) {
++    }
++
++    public function getData(): array
++    {
++        return $this->response->toArray(false);
++    }
++
++    public function getDataStream(): iterable
++    {
++        $buffer = '';
++
++        foreach ($this->httpClient->stream($this->response) as $chunk) {
++            if ($chunk->isFirst() || $chunk->isLast()) {
++                continue;
++            }
++
++            $buffer .= $chunk->getContent();
++
++            while (false !== ($pos = strpos($buffer, "\n"))) {
++                $line = substr($buffer, 0, $pos);
++                $buffer = substr($buffer, $pos + 1);
++                $line = trim($line);
++
++                if ('' === $line) {
++                    continue;
++                }
++
++                yield json_decode($line, true, flags: \JSON_THROW_ON_ERROR);
++            }
++        }
++
++        $buffer = trim($buffer);
++
++        if ('' !== $buffer) {
++            yield json_decode($buffer, true, flags: \JSON_THROW_ON_ERROR);
++        }
++    }
++
++    public function getObject(): ResponseInterface
++    {
++        return $this->response;
++    }
++}
+diff --git a/src/platform/tests/Result/NdjsonHttpResultTest.php b/src/platform/tests/Result/NdjsonHttpResultTest.php
+new file mode 100644
+index 0000000000..b3a4d47ebd
+--- /dev/null
++++ b/src/platform/tests/Result/NdjsonHttpResultTest.php
+@@ -0,0 +1,150 @@
++<?php
++
++/*
++ * This file is part of the Symfony package.
++ *
++ * (c) Fabien Potencier <fabien@symfony.com>
++ *
++ * For the full copyright and license information, please view the LICENSE
++ * file that was distributed with this source code.
++ */
++
++namespace Symfony\AI\Platform\Tests\Result;
++
++use PHPUnit\Framework\TestCase;
++use Symfony\AI\Platform\Result\NdjsonHttpResult;
++use Symfony\Component\HttpClient\MockHttpClient;
++use Symfony\Component\HttpClient\Response\MockResponse;
++use Symfony\Contracts\HttpClient\ResponseInterface;
++
++/**
++ * @author Johannes Wachter <johannes@sulu.io>
++ */
++final class NdjsonHttpResultTest extends TestCase
++{
++    public function testGetData()
++    {
++        $responseData = ['key' => 'value', 'nested' => ['foo' => 'bar']];
++        $httpClient = new MockHttpClient([
++            new MockResponse(json_encode($responseData)),
++        ]);
++        $response = $httpClient->request('GET', 'https://example.com');
++
++        $rawResult = new NdjsonHttpResult($response, $httpClient);
++
++        $this->assertSame($responseData, $rawResult->getData());
++    }
++
++    public function testGetObject()
++    {
++        $httpClient = new MockHttpClient([
++            new MockResponse('{"key": "value"}'),
++        ]);
++        $response = $httpClient->request('GET', 'https://example.com');
++
++        $rawResult = new NdjsonHttpResult($response, $httpClient);
++
++        $this->assertInstanceOf(ResponseInterface::class, $rawResult->getObject());
++        $this->assertSame($response, $rawResult->getObject());
++    }
++
++    public function testGetDataStreamWithSingleLine()
++    {
++        $httpClient = new MockHttpClient([
++            new MockResponse(json_encode(['message' => 'hello', 'done' => true])."\n"),
++        ]);
++        $response = $httpClient->request('GET', 'https://example.com');
++
++        $rawResult = new NdjsonHttpResult($response, $httpClient);
++
++        $results = iterator_to_array($rawResult->getDataStream());
++
++        $this->assertCount(1, $results);
++        $this->assertSame(['message' => 'hello', 'done' => true], $results[0]);
++    }
++
++    public function testGetDataStreamWithMultipleLines()
++    {
++        $ndjson = json_encode(['model' => 'llama3.2', 'message' => ['content' => 'Hello'], 'done' => false])."\n"
++            .json_encode(['model' => 'llama3.2', 'message' => ['content' => ' world'], 'done' => false])."\n"
++            .json_encode(['model' => 'llama3.2', 'message' => ['content' => ''], 'done' => true])."\n";
++
++        $httpClient = new MockHttpClient([
++            new MockResponse($ndjson),
++        ]);
++        $response = $httpClient->request('GET', 'https://example.com');
++
++        $rawResult = new NdjsonHttpResult($response, $httpClient);
++
++        $results = iterator_to_array($rawResult->getDataStream());
++
++        $this->assertCount(3, $results);
++        $this->assertSame('Hello', $results[0]['message']['content']);
++        $this->assertFalse($results[0]['done']);
++        $this->assertSame(' world', $results[1]['message']['content']);
++        $this->assertFalse($results[1]['done']);
++        $this->assertSame('', $results[2]['message']['content']);
++        $this->assertTrue($results[2]['done']);
++    }
++
++    public function testGetDataStreamHandlesChunkBoundaryMidObject()
++    {
++        $line1 = json_encode(['model' => 'llama3.2', 'message' => ['content' => 'Hello'], 'done' => false]);
++        $line2 = json_encode(['model' => 'llama3.2', 'message' => ['content' => ' world'], 'done' => true]);
++
++        // Split the first JSON object mid-way across two chunks
++        $splitPoint = (int) (\strlen($line1) / 2);
++        $chunk1 = substr($line1, 0, $splitPoint);
++        $chunk2 = substr($line1, $splitPoint)."\n".$line2."\n";
++
++        $httpClient = new MockHttpClient([
++            new MockResponse([$chunk1, $chunk2]),
++        ]);
++        $response = $httpClient->request('GET', 'https://example.com');
++
++        $rawResult = new NdjsonHttpResult($response, $httpClient);
++
++        $results = iterator_to_array($rawResult->getDataStream());
++
++        $this->assertCount(2, $results);
++        $this->assertSame('Hello', $results[0]['message']['content']);
++        $this->assertFalse($results[0]['done']);
++        $this->assertSame(' world', $results[1]['message']['content']);
++        $this->assertTrue($results[1]['done']);
++    }
++
++    public function testGetDataStreamIgnoresEmptyLines()
++    {
++        $ndjson = json_encode(['done' => false])."\n\n\n".json_encode(['done' => true])."\n";
++
++        $httpClient = new MockHttpClient([
++            new MockResponse($ndjson),
++        ]);
++        $response = $httpClient->request('GET', 'https://example.com');
++
++        $rawResult = new NdjsonHttpResult($response, $httpClient);
++
++        $results = iterator_to_array($rawResult->getDataStream());
++
++        $this->assertCount(2, $results);
++        $this->assertFalse($results[0]['done']);
++        $this->assertTrue($results[1]['done']);
++    }
++
++    public function testGetDataStreamHandlesLastLineWithoutTrailingNewline()
++    {
++        $ndjson = json_encode(['message' => 'hello', 'done' => true]);
++
++        $httpClient = new MockHttpClient([
++            new MockResponse($ndjson),
++        ]);
++        $response = $httpClient->request('GET', 'https://example.com');
++
++        $rawResult = new NdjsonHttpResult($response, $httpClient);
++
++        $results = iterator_to_array($rawResult->getDataStream());
++
++        $this->assertCount(1, $results);
++        $this->assertSame('hello', $results[0]['message']);
++    }
++}

@@ -6,7 +6,7 @@ AI-powered development process agent built on Symfony/TUI and Symfony/AI.
 
 ```bash
 # Prerequisites
-ollama pull kimi-k2
+ollama pull kimi-k2.5:cloud
 ollama pull nomic-embed-text
 
 # Configure
@@ -27,15 +27,37 @@ php bin/devbot run
 | `php vendor/bin/phpstan analyse` | Static analysis |
 | `php vendor/bin/php-cs-fixer fix` | Fix code style |
 
+## TUI Controls
+
+- **Ctrl+Enter** — Send message
+- **Ctrl+Q** — Quit
+
 ## Architecture
 
 See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for development conventions.
 
-## Current State: Phase 1
+## Current State: Phase 2
 
-- Symfony 8.x project scaffold with full directory structure
-- TUI chat interface (EditorWidget + MarkdownWidget) via symfony/tui
-- Agent wired to Ollama/kimi-k2 via symfony/ai
+### Phase 1 — Foundation
+- Symfony 8.x with symfony/ai (dev-main) and symfony/tui (fabpot PR #63778)
+- TUI chat with streaming responses (TextWidget + EditorWidget with border)
+- Agent wired to Ollama/kimi-k2.5:cloud via AmpHttpClient (non-blocking I/O)
 - Identity system (SOUL.md, IDENTITY.md, human profiles) with injection processor
 - Web search/fetch tools via Ollama REST API
-- PHPStan level 6 clean, unit tests passing
+- Vendor patches for NDJSON streaming (symfony/ai PR #1827)
+
+### Phase 2 — Memory System
+- Four memory tiers: ShortTerm (ring buffer), LongTerm (markdown+JSON), Episodic (dated JSON), Semantic (SQLite vectors)
+- MemoryManager facade routing across all stores with auto-indexing
+- Agentic multi-hop RAG via MemoryCorpus (search/grep/read/prune with dedup)
+- 8 agent tools: memory_search, memory_grep, memory_read, memory_prune, memory_add, memory_remove, memory_update, memory_list
+- MemoryInjectionProcessor auto-injects relevant context before each agent call
+- RuleBasedImportanceScorer for heuristic memory scoring
+
+### Vendor Patches
+- `patches/ollama-ndjson-streaming.patch` — OllamaClient uses NdjsonHttpResult (PR #1827)
+- `patches/platform-ndjson-result.patch` — adds NdjsonHttpResult class for NDJSON streaming
+
+### Quality
+- PHPStan level 6: 0 errors
+- 18 unit tests passing

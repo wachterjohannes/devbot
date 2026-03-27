@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tui\Widget;
 
-use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Widget\TextWidget;
 
 /**
- * Bottom status bar showing model name and session info.
+ * Bottom status bar showing model name, token count, and version.
  */
 final class StatusBarWidget extends TextWidget
 {
-    private string $model = 'kimi-k2';
+    private string $model = 'kimi-k2.5:cloud';
     private int $tokenCount = 0;
 
     public function __construct()
     {
         parent::__construct($this->buildText(), truncate: true);
         $this->addStyleClass('bg-gray-800');
-        $this->addStyleClass('text-gray-300');
+        $this->addStyleClass('text-cyan-400');
         $this->addStyleClass('p-1');
+        $this->addStyleClass('bold');
     }
 
     public function setModel(string $model): void
@@ -37,6 +37,6 @@ final class StatusBarWidget extends TextWidget
 
     private function buildText(): string
     {
-        return sprintf(' Model: %s | Tokens: %d | DevBot v0.1', $this->model, $this->tokenCount);
+        return sprintf(' DevBot v0.1  |  Model: %s  |  Tokens: %d  |  Ctrl+Q quit', $this->model, $this->tokenCount);
     }
 }

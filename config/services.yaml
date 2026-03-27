@@ -40,6 +40,10 @@ services:
             $store: '@ai.store.sqlite.memory_store'
             $vectorizer: '@ai.vectorizer.ollama_embeddings'
 
+    # Amp HTTP client for non-blocking I/O with Revolt event loop
+    devbot.http_client.amp:
+        class: Symfony\Component\HttpClient\AmpHttpClient
+
     # Memory injection processor
     App\Agent\Processor\MemoryInjectionProcessor:
         arguments:

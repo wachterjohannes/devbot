@@ -1,0 +1,29 @@
+{
+    "_hash": "51681cad6e7282f1b9c4bf7a97629f9de9ed4c1fda0d9aa1a9b3cad230a61de5",
+    "patches": {
+        "symfony/ai-ollama-platform": [
+            {
+                "package": "symfony/ai-ollama-platform",
+                "description": "NDJSON streaming support (PR #1827)",
+                "url": "patches/ollama-ndjson-streaming.patch",
+                "sha256": "87371a1355476b7935ec1692d5def47dcef9eb3896f3338d67063cd87e1af8a4",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "symfony/ai-platform": [
+            {
+                "package": "symfony/ai-platform",
+                "description": "Add NdjsonHttpResult for NDJSON streaming (PR #1827)",
+                "url": "patches/platform-ndjson-result.patch",
+                "sha256": "6a65367ee5f60088bda88d925d56fb9da396e6fb72ccd6af4025bcaaa73dab94",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}
