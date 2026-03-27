@@ -33,7 +33,8 @@ final class EpisodicStore
 
         $timestamp = $entry->metadata->createdAt->format('His');
         $eventType = $this->extractEventType($entry);
-        $filename = "{$timestamp}-{$eventType}.json";
+        $suffix = substr($entry->id, 0, 8);
+        $filename = "{$timestamp}-{$eventType}-{$suffix}.json";
 
         file_put_contents(
             $dir . '/' . $filename,

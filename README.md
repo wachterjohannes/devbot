@@ -62,9 +62,10 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - 16 total agent tools registered
 
 ### Vendor Patches
-- `patches/ollama-ndjson-streaming.patch` — OllamaClient uses NdjsonHttpResult (PR #1827)
-- `patches/platform-ndjson-result.patch` — adds NdjsonHttpResult class for NDJSON streaming
+- `patches/ollama-ndjson-streaming.patch` — OllamaClient uses NdjsonHttpResult ([PR #1827](https://github.com/symfony/ai/pull/1827))
+- `patches/platform-ndjson-result.patch` — adds NdjsonHttpResult class for NDJSON streaming ([PR #1827](https://github.com/symfony/ai/pull/1827))
+- `patches/ai-bundle-traceable-store-managed.patch` — TraceableStore implements ManagedStoreInterface ([PR #1828](https://github.com/symfony/ai/pull/1828))
 
 ### Quality
 - PHPStan level 6: 0 errors
-- 25 unit tests passing
+- 58 tests (unit + integration) passing

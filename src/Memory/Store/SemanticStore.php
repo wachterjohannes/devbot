@@ -18,7 +18,7 @@ use Symfony\AI\Store\StoreInterface;
  * Vector-indexed semantic store wrapping symfony/ai-sqlite-store.
  * All memory entries that are persisted get embedded and stored here for fuzzy/semantic search.
  */
-final class SemanticStore
+class SemanticStore
 {
     public function __construct(
         private readonly StoreInterface $store,
