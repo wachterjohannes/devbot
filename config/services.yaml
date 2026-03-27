@@ -21,3 +21,26 @@ services:
             $apiKey: '%devbot.web.ollama_api_key%'
             $searchMaxResults: '%devbot.web.search_max_results%'
             $fetchTimeout: '%devbot.web.fetch_timeout%'
+
+    # Memory stores
+    App\Memory\Store\ShortTermStore:
+        arguments:
+            $maxEntries: 50
+
+    App\Memory\Store\LongTermStore:
+        arguments:
+            $baseDir: '%kernel.project_dir%/memory/long-term'
+
+    App\Memory\Store\EpisodicStore:
+        arguments:
+            $baseDir: '%kernel.project_dir%/memory/episodic'
+
+    App\Memory\Store\SemanticStore:
+        arguments:
+            $store: '@ai.store.sqlite.memory_store'
+            $vectorizer: '@ai.vectorizer.ollama_embeddings'
+
+    # Memory injection processor
+    App\Agent\Processor\MemoryInjectionProcessor:
+        arguments:
+            $maxInjectedEntries: 3
