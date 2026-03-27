@@ -58,6 +58,20 @@ services:
         arguments:
             $workingDirectory: '%devbot.shell.working_directory%'
 
+    # Skill Manager
+    App\Skill\SkillManager:
+        arguments:
+            $skillsDir: '%kernel.project_dir%/skills'
+
+    # Heartbeat
+    App\Heartbeat\ScheduledTaskManager:
+        arguments:
+            $filePath: '%kernel.project_dir%/heartbeat/scheduled.json'
+
+    App\Heartbeat\HeartbeatLoop:
+        arguments:
+            $tickInterval: 30
+
     # Memory injection processor
     App\Agent\Processor\MemoryInjectionProcessor:
         arguments:

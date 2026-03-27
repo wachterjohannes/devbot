@@ -36,7 +36,7 @@ php bin/devbot run
 
 See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for development conventions.
 
-## Current State: Phase 3
+## Current State: Phase 5
 
 ### Phase 1 — Foundation
 - Symfony 8.x with symfony/ai (dev-main) and symfony/tui (fabpot PR #63778)
@@ -59,7 +59,14 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - KanbanManager for CRUD with automatic save
 - 4 kanban tools: kanban_list, kanban_create_card, kanban_move_card, kanban_update_card
 - 2 git tools: git_status (status/log/diff/branch), git_commit (stage + commit)
-- 16 total agent tools registered
+### Phase 5 — Skills + Heartbeat
+- Skill system: markdown-based reusable workflows the bot creates and runs
+- SkillParser/SkillManager for CRUD with index.json registry
+- SkillRunner executes skills by building prompts and calling the agent
+- 6 skill tools: skill_create, skill_update, skill_run, skill_list, skill_toggle, skill_delete
+- HeartbeatLoop: Fiber-based background scheduler (cron, interval, one-off)
+- 3 scheduled task tools: schedule_task, list_scheduled, cancel_scheduled
+- 25 total agent tools registered
 
 ### Vendor Patches
 - `patches/ollama-ndjson-streaming.patch` — OllamaClient uses NdjsonHttpResult ([PR #1827](https://github.com/symfony/ai/pull/1827))
@@ -68,4 +75,4 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 
 ### Quality
 - PHPStan level 6: 0 errors
-- 58 tests (unit + integration) passing
+- 72 tests (unit + integration) passing

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tui;
 
+use App\Heartbeat\HeartbeatLoop;
 use App\Tui\Widget\ChatWidget;
 use App\Tui\Widget\StatusBarWidget;
 use Symfony\AI\Agent\AgentInterface;
@@ -12,14 +13,13 @@ use Symfony\Component\Tui\Widget\ContainerWidget;
 
 /**
  * Root TUI application. Lays out: chat output (expands) + editor (fixed) + status bar.
- *
- * Phase 1: Single-tab chat interface.
- * Phase 4 adds tabs (Board, Memory, Logs).
+ * Starts the heartbeat loop alongside the TUI for scheduled tasks.
  */
 final class App
 {
     public function __construct(
         private readonly AgentInterface $agent,
+        private readonly HeartbeatLoop $heartbeatLoop,
     ) {
     }
 
@@ -33,7 +33,6 @@ final class App
         $layout->setId('main-layout');
         $layout->expandVertically(true);
 
-        // Output area — wrapped in expanding container to fill available space
         $outputContainer = new ContainerWidget();
         $outputContainer->setId('output-container');
         $outputContainer->expandVertically(true);
@@ -47,6 +46,13 @@ final class App
 
         $tui->add($layout);
         $tui->quitOn('ctrl+q');
+
+        // Start heartbeat alongside TUI (same Revolt event loop)
+        $this->heartbeatLoop->start();
+
         $tui->run();
+
+        // Clean up after TUI exits
+        $this->heartbeatLoop->stop();
     }
 }
