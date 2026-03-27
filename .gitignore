@@ -2,4 +2,15 @@
 /var/
 /.env.local
 /.php-cs-fixer.cache
+/.phpunit.result.cache
 /composer.lock
+/memory/long-term/
+/memory/episodic/
+/memory/short-term/
+/memory/semantic/
+/kanban/board.json
+/heartbeat/scheduled.json
+/skills/*.md
+!/skills/archive/
+/identity/humans/*.md
+!/identity/humans/_template.md

@@ -68,6 +68,14 @@ final class ChatWidget
         return $this->output;
     }
 
+    public function focusEditor(): void
+    {
+        $context = $this->editor->getContext();
+        if ($context !== null) {
+            $context->getFocusManager()->setFocus($this->editor);
+        }
+    }
+
     public function getEditor(): EditorWidget
     {
         return $this->editor;

@@ -17,10 +17,11 @@ final class StatusBarWidget extends TextWidget
     public function __construct()
     {
         parent::__construct($this->buildText(), truncate: true);
-        $this->addStyleClass('bg-gray-800');
-        $this->addStyleClass('text-cyan-400');
+        $this->addStyleClass('bg-gray-700');
+        $this->addStyleClass('text-gray-300');
         $this->addStyleClass('p-1');
-        $this->addStyleClass('bold');
+        $this->addStyleClass('border-t-1');
+        $this->addStyleClass('border-gray-600');
     }
 
     public function setModel(string $model): void
@@ -37,6 +38,6 @@ final class StatusBarWidget extends TextWidget
 
     private function buildText(): string
     {
-        return sprintf(' DevBot v0.1  |  Model: %s  |  Tokens: %d  |  Ctrl+Q quit', $this->model, $this->tokenCount);
+        return sprintf(' DevBot v0.1  |  %s  |  Tokens: %d  |  Ctrl+Q quit', $this->model, $this->tokenCount);
     }
 }
