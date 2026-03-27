@@ -43,7 +43,7 @@ final readonly class OllamaWebBridge
                 'Content-Type' => 'application/json',
             ],
             'json' => [
-                'q' => $query,
+                'query' => $query,
                 'max_results' => min($maxResults, 10),
             ],
             'timeout' => $this->fetchTimeout,
