@@ -36,7 +36,7 @@ php bin/devbot run
 
 See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for development conventions.
 
-## Current State: Phase 5
+## Current State: Phase 6
 
 ### Phase 1 — Foundation
 - Symfony 8.x with symfony/ai (dev-main) and symfony/tui (fabpot PR #63778)
@@ -66,7 +66,13 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - 6 skill tools: skill_create, skill_update, skill_run, skill_list, skill_toggle, skill_delete
 - HeartbeatLoop: Fiber-based background scheduler (cron, interval, one-off)
 - 3 scheduled task tools: schedule_task, list_scheduled, cancel_scheduled
-- 25 total agent tools registered
+### Phase 6 — Claude Code Delegation
+- `claude_delegate` tool: delegates tasks to Claude Code (`claude -p` subprocess)
+- Plan mode (`--permission-mode plan`): read-only analysis, architecture, code review
+- Dev mode (`--permission-mode acceptEdits`): coding, refactoring, debugging
+- Model selection: sonnet (default), opus (complex), haiku (quick)
+- Claude Code platform registered manually (no bundle config yet)
+- 26 total agent tools registered
 
 ### Vendor Patches
 - `patches/ollama-ndjson-streaming.patch` — OllamaClient uses NdjsonHttpResult ([PR #1827](https://github.com/symfony/ai/pull/1827))

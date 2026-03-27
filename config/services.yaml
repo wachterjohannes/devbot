@@ -44,6 +44,20 @@ services:
     devbot.http_client.amp:
         class: Symfony\Component\HttpClient\AmpHttpClient
 
+    # Claude Code platform (no bundle config yet — registered manually)
+    devbot.claude_code.platform:
+        class: Symfony\AI\Platform\Platform
+        factory: ['Symfony\AI\Platform\Bridge\ClaudeCode\PlatformFactory', 'create']
+        arguments:
+            $workingDirectory: '%devbot.shell.working_directory%'
+            $timeout: 300
+
+    # Coding delegate tool
+    App\Tool\CodingAgent\CodingDelegateTool:
+        arguments:
+            $platform: '@devbot.claude_code.platform'
+            $workingDirectory: '%devbot.shell.working_directory%'
+
     # Kanban Manager
     App\Kanban\KanbanManager:
         arguments:

@@ -1,6 +1,6 @@
 # Tools Reference
 
-DevBot has 25 agent tools available. The LLM decides when and how to call them.
+DevBot has 26 agent tools available. The LLM decides when and how to call them.
 
 ## Memory Tools
 
@@ -47,6 +47,28 @@ DevBot has 25 agent tools available. The LLM decides when and how to call them.
 | In Progress | 3 |
 | Review | 2 |
 | Done | — |
+
+## Claude Code Delegation
+
+| Tool | Description |
+|------|-------------|
+| `claude_delegate` | Delegate a complex task to Claude Code (`claude -p` subprocess). Supports plan/dev modes, model selection, context injection. |
+
+### Modes
+
+| Mode | Permission Mode | Use For |
+|------|----------------|---------|
+| `plan` | `--permission-mode plan` | Architecture, analysis, code review, estimations (read-only) |
+| `dev` | `--permission-mode acceptEdits` | Coding, refactoring, debugging, file modifications (default) |
+| `auto` | `--permission-mode auto` | Let Claude decide what permissions it needs |
+
+### Models
+
+| Model | Best For |
+|-------|---------|
+| `sonnet` | Default — fast, capable, cost-effective |
+| `opus` | Complex architecture, deep analysis |
+| `haiku` | Quick tasks, simple edits |
 
 ## Git Tools
 
@@ -95,3 +117,5 @@ Ask DevBot naturally — it picks the right tools:
 - _"What skills do you have?"_ → `skill_list`
 - _"Run the news digest skill now"_ → `skill_run`
 - _"Remind me tomorrow at 10:00 to review the PR"_ → `schedule_task`
+- _"Refactor the UserController to use dependency injection"_ → `claude_delegate` (mode: dev)
+- _"Analyze the codebase and propose an architecture for the new API"_ → `claude_delegate` (mode: plan)
