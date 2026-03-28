@@ -14,9 +14,8 @@ COPY dist/app/ .
 
 WORKDIR /go/src/app/
 
-# Build with only the extensions we need
+# Build with default extensions (auto-resolves all transitive dependencies)
 RUN EMBED=dist/app/ \
-    PHP_EXTENSIONS="ctype,curl,dom,fileinfo,filter,iconv,intl,ldap,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib" \
     PHP_VERSION="8.4" \
     ./build-static.sh
 

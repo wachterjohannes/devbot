@@ -84,10 +84,11 @@ jobs:
         run: git clone --depth 1 https://github.com/dunglas/frankenphp.git /tmp/frankenphp
 
       - name: Build static binary
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd /tmp/frankenphp
           EMBED=${{ github.workspace }}/dist/app/ \
-          PHP_EXTENSIONS="ctype,curl,dom,fileinfo,filter,iconv,intl,ldap,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib" \
           PHP_VERSION="8.4" \
           ./build-static.sh
 
