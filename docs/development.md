@@ -16,27 +16,45 @@ php vendor/bin/php-cs-fixer fix     # Fix code style (PSR-12)
 src/
 ├── Command/             # Console commands (DevBotCommand)
 ├── Tui/                 # TUI application and widgets
-│   ├── App.php          # Root layout
-│   └── Widget/          # ChatWidget, StatusBarWidget
+│   ├── App.php          # Root layout with tabbed views (F1/F2/F3)
+│   └── Widget/          # ChatWidget, KanbanWidget, MemoryBrowserWidget, StatusBarWidget
 ├── Agent/
-│   └── Processor/       # IdentityInjection, MemoryInjection
+│   ├── Processor/       # IdentityInjection, MemoryInjection, ContextTruncation
+│   └── Prompt/          # ContextWindowManager
 ├── Memory/
 │   ├── MemoryManager.php  # Facade for all stores
 │   ├── Model/           # MemoryEntry, MemoryType, MemoryMetadata
 │   ├── Store/           # ShortTerm, LongTerm, Episodic, Semantic
 │   ├── Search/          # MemoryCorpus (agentic RAG)
-│   └── Strategy/        # RuleBasedImportanceScorer
+│   ├── Strategy/        # RuleBasedImportanceScorer
+│   └── Lifecycle/       # SessionEndHandler, GarbageCollector
 ├── Identity/
 │   ├── IdentityManager.php
-│   └── Model/           # Soul, Identity, HumanProfile
+│   ├── Model/           # Soul, Identity, HumanProfile
+│   └── Updater/         # ProfileLearner
 ├── Kanban/
 │   ├── KanbanManager.php
 │   └── Model/           # Board, Column, Card, CardStatus
+├── Skill/               # Skill system
+│   ├── SkillManager.php
+│   ├── SkillParser.php
+│   ├── SkillRunner.php
+│   └── Model/           # Skill, SkillTrigger
+├── Heartbeat/           # Heartbeat / scheduled tasks
+│   ├── HeartbeatLoop.php
+│   ├── TaskScheduler.php
+│   ├── TaskExecutor.php
+│   ├── ScheduledTaskManager.php
+│   └── Model/           # ScheduledTask
 ├── Tool/                # Agent tools (#[AsTool])
-│   ├── Memory/          # 8 memory tools
+│   ├── Memory/          # 8 memory tools (search, grep, read, prune, add, remove, update, list)
 │   ├── Kanban/          # 4 kanban tools
-│   ├── Git/             # 2 git tools
-│   └── Web/             # 2 web tools
+│   ├── Git/             # 2 git tools (status, commit)
+│   ├── Web/             # 2 web tools (search, fetch)
+│   ├── Skill/           # 6 skill tools (create, update, run, list, toggle, delete)
+│   ├── Heartbeat/       # 3 scheduled task tools (schedule, list, cancel)
+│   ├── CodingAgent/     # 1 Claude Code delegation tool
+│   └── Shell/           # 1 shell exec tool
 └── Bridge/              # External service bridges
     └── OllamaWebBridge.php
 ```

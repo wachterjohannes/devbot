@@ -6,7 +6,6 @@ namespace App\Memory\Lifecycle;
 
 use App\Memory\MemoryManager;
 use App\Memory\Model\MemoryEntry;
-use App\Memory\Model\MemoryType;
 use App\Memory\Store\EpisodicStore;
 use App\Memory\Store\LongTermStore;
 

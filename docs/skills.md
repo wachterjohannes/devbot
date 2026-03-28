@@ -51,6 +51,7 @@ Or use the tools directly: `skill_create`, `skill_list`, `skill_run`, `skill_tog
 | `manual` | — | Run only when asked |
 | `cron` | Cron expression | `0 9 * * *` (daily at 9:00) |
 | `interval` | Seconds | `900` (every 15 minutes) |
+| `event` | Event name | Triggered by a specific event (future) |
 
 ### Storage
 

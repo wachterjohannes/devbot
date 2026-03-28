@@ -5,6 +5,7 @@
 - **PHP 8.4+**
 - **Ollama** running locally — [ollama.com](https://ollama.com)
 - **Ollama API key** (free) for web search — [ollama.com/settings/keys](https://ollama.com/settings/keys)
+- **Claude Code CLI** installed and authenticated (for coding delegation) — [claude.ai/download](https://claude.ai/download)
 
 Pull the required models:
 
@@ -54,4 +55,6 @@ php bin/devbot run
 |-----|--------|
 | **Ctrl+Enter** | Send message |
 | **Ctrl+Q** | Quit |
-| **F6 / Shift+F6** | Cycle focus between widgets |
+| **F1** | Chat tab |
+| **F2** | Kanban board tab |
+| **F3** | Memory browser tab |

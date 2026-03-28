@@ -8,8 +8,6 @@ use App\Memory\MemoryManager;
 use App\Memory\Model\MemoryEntry;
 use App\Memory\Model\MemoryType;
 use Symfony\Component\Tui\Event\SelectionChangeEvent;
-use Symfony\Component\Tui\Style\Direction;
-use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\SelectListWidget;
 use Symfony\Component\Tui\Widget\TextWidget;

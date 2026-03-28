@@ -117,6 +117,50 @@ Skills can reference other tools, creating complex workflows:
 
 The agent follows the steps using `git_status`, `kanban_list`, date arithmetic, and `memory_add`. The heartbeat runs it every Monday at 9:00.
 
+## Shell Commands
+
+### Running Project Scripts
+
+> "Run composer install and show me the output"
+
+DevBot calls `shell_exec` with `composer install`. Output is returned directly.
+
+### Inspecting Files
+
+> "Find all PHP files that contain 'deprecated'"
+
+```
+-> shell_exec("grep -r 'deprecated' --include='*.php' .")
+```
+
+### Build & Test
+
+> "Run the test suite and tell me if anything fails"
+
+```
+-> shell_exec("php vendor/bin/phpunit")
+```
+
+> "Check for code style issues"
+
+```
+-> shell_exec("php vendor/bin/php-cs-fixer fix --dry-run --diff")
+```
+
+### Quick Checks
+
+> "How many lines of PHP code do we have?"
+
+```
+-> shell_exec("find src -name '*.php' | xargs wc -l | tail -1")
+```
+
+> "Show me the git log for the last week"
+
+```
+-> shell_exec("git log --oneline --since='1 week ago'")
+```
+
 ## Claude Code Delegation
 
 ### Architecture Planning

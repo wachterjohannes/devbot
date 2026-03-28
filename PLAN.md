@@ -1061,6 +1061,8 @@ mcp:
 
 ### Phase 1: Foundation (Week 1-2)
 
+**Status: Complete**
+
 **Goal**: Basic working agent with TUI shell and chat capability.
 
 1. **Project scaffold**
@@ -1094,6 +1096,8 @@ mcp:
 ---
 
 ### Phase 2: Memory System (Week 3-4)
+
+**Status: Complete**
 
 **Goal**: Full memory system with all four tiers and agent-accessible tools.
 
@@ -1134,6 +1138,8 @@ mcp:
 
 ### Phase 3: Kanban + Git Integration (Week 5-6)
 
+**Status: Partial** -- Kanban data model, TUI widget, tools, and local git tools are done. Missing: GitHub API integration (GitHubApiService, GitHubTool), GitLab API integration (GitLabApiService, GitLabTool), issue sync.
+
 **Goal**: Working kanban board with GitHub/GitLab sync.
 
 1. **Kanban data model**
@@ -1167,6 +1173,8 @@ mcp:
 
 ### Phase 4: Telegram + Multi-Tab TUI (Week 7-8)
 
+**Status: Partial** -- Multi-tab TUI done (Chat/Board/Memory with F1/F2/F3 switching), ProfileLearner done. Missing: Telegram bridge, Telegram tools, approval flow, Logs tab.
+
 **Goal**: Full TUI with all tabs and Telegram integration.
 
 1. **Telegram bridge**
@@ -1194,6 +1202,8 @@ mcp:
 ---
 
 ### Phase 5: Skill System + Heartbeat + Web (Week 9-10)
+
+**Status: Complete**
 
 **Goal**: Bot can manage its own skills, run periodic tasks, and use web search in workflows.
 
@@ -1233,6 +1243,8 @@ mcp:
 
 ### Phase 6: Claude Code Subagent + MCP Server + External Tools (Week 11-12)
 
+**Status: Partial** -- CodingDelegateTool done (delegates to Claude Code with plan/dev/auto modes). Missing: DevBot as MCP server, MCP client connections, tool discovery UI.
+
 **Goal**: Wire up Claude Code as coding subagent, DevBot acts as MCP server and connects to external MCP servers.
 
 1. **Claude Code subagent**
@@ -1258,6 +1270,8 @@ mcp:
 ---
 
 ### Phase 7: Polish + Hardening (Week 13-14)
+
+**Status: Partial** -- Context window management done (ContextWindowManager + ContextTruncationProcessor), unit and integration tests written (86 tests). Missing: comprehensive error handling, full test coverage, V-Server deployment (systemd, headless mode is stub only), ARCHITECTURE.md.
 
 1. **Context window management**
    - Smart truncation strategy for long conversations

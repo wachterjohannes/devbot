@@ -7,6 +7,7 @@
 | `OLLAMA_HOST_URL` | Ollama API endpoint | `http://localhost:11434` |
 | `OLLAMA_API_KEY` | Ollama API key for web search | _(required)_ |
 | `DEVBOT_WORKDIR` | Working directory for git/shell tools | _(required)_ |
+| `APP_SECRET` | Symfony application secret | _(change in production)_ |
 | `TELEGRAM_BOT_TOKEN` | Telegram bot token (future) | _(optional)_ |
 | `TELEGRAM_CHAT_ID` | Telegram chat ID (future) | _(optional)_ |
 

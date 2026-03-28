@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Memory\Lifecycle;
 
 use App\Memory\MemoryManager;
-use App\Memory\Model\MemoryType;
 use App\Memory\Store\ShortTermStore;
 use App\Memory\Strategy\RuleBasedImportanceScorer;
 
