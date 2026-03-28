@@ -69,7 +69,7 @@ build-macos: prepare
 	fi
 	cd $(DIST_DIR)/frankenphp && \
 		EMBED=$(CURDIR)/$(DIST_DIR)/app/ \
-		PHP_EXTENSIONS="ctype,dom,fileinfo,filter,iconv,intl,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib" \
+		PHP_EXTENSIONS="ctype,dom,fileinfo,filter,iconv,intl,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib,zstd" \
 		PHP_VERSION="8.4" \
 		./build-static.sh
 	@ARCH=$$(uname -m); \
