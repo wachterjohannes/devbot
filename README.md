@@ -47,7 +47,7 @@ php bin/devbot run
 | **F6** | Cycle focus between widgets |
 | **Ctrl+Q** | Quit |
 
-## 30 Agent Tools
+## 33 Agent Tools
 
 | Category | Tools |
 |----------|-------|
@@ -55,11 +55,11 @@ php bin/devbot run
 | **Kanban** (4) | kanban_list, kanban_create_card, kanban_move_card, kanban_update_card |
 | **Skills** (6) | skill_create, skill_update, skill_run, skill_list, skill_toggle, skill_delete |
 | **Heartbeat** (3) | schedule_task, list_scheduled, cancel_scheduled |
-| **Git** (2) | git_status, git_commit |
+| **Git** (4) | git_status, git_commit, github (issues/PRs/comments via gh CLI), gitlab (issues/MRs/comments via glab CLI) |
 | **Web** (2) | web_search, web_fetch |
 | **Shell** (1) | shell_exec (sandboxed with command allowlist) |
 | **Claude** (1) | claude_delegate (plan/dev modes, model selection) |
-| **Client** (3) | client_exec, client_file_read, client_file_list (reverse execution on connected client) |
+| **Client** (4) | client_exec, client_file_read, client_file_list, client_claude_delegate (reverse execution on connected client) |
 
 ## Documentation
 

@@ -75,6 +75,14 @@ services:
         arguments:
             $workingDirectory: '%devbot.shell.working_directory%'
 
+    App\Tool\Git\GitHubTool:
+        arguments:
+            $workingDirectory: '%devbot.shell.working_directory%'
+
+    App\Tool\Git\GitLabTool:
+        arguments:
+            $workingDirectory: '%devbot.shell.working_directory%'
+
     App\Tool\Shell\ShellExecTool:
         arguments:
             $workingDirectory: '%devbot.shell.working_directory%'
