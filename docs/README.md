@@ -8,6 +8,7 @@
 - [Memory System](memory.md) — Four-tier memory, agentic search, lifecycle, context management
 - [Skills & Heartbeat](skills.md) — Reusable workflows, scheduled tasks, reminders
 - [Use Cases](use-cases.md) — Real-world examples and workflow patterns
+- [Headless Mode & Client](headless.md) — V-Server deployment, remote access via SSH
 
 ## Developer Guide
 

@@ -26,7 +26,9 @@ php bin/devbot run
 | Command | Description |
 |---------|-------------|
 | `php bin/devbot run` | Start TUI chat interface |
-| `php bin/devbot run --headless` | Heartbeat + Telegram only (future) |
+| `php bin/devbot run --headless` | Headless mode: heartbeat + socket server |
+| `php bin/devbot client` | Connect to headless server (local) |
+| `php bin/devbot client --host user@server` | Connect to headless server (remote via SSH) |
 | `php bin/devbot ai:store:setup ai.store.sqlite.memory_store` | Set up SQLite vector store |
 | `php vendor/bin/phpunit` | Run tests |
 | `php vendor/bin/phpstan analyse` | Static analysis |
