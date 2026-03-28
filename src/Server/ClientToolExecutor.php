@@ -32,6 +32,7 @@ final readonly class ClientToolExecutor
         return match ($tool) {
             'shell' => $this->handleShell($operation, $args),
             'filesystem' => $this->handleFilesystem($operation, $args),
+            'claude' => $this->handleClaude($operation, $args),
             default => ['type' => 'tool_response', 'error' => "Unknown tool: {$tool}"],
         };
     }
@@ -128,6 +129,48 @@ final readonly class ClientToolExecutor
             'type' => 'tool_response',
             'files' => $files,
             'path' => $path,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
+     */
+    private function handleClaude(string $operation, array $args): array
+    {
+        if ($operation !== 'run') {
+            return ['type' => 'tool_response', 'error' => "Unknown claude operation: {$operation}"];
+        }
+
+        $prompt = $args['prompt'] ?? '';
+        $model = $args['model'] ?? 'sonnet';
+        $permissionMode = $args['permission_mode'] ?? 'acceptEdits';
+        $cwd = $args['working_directory'] ?? null;
+
+        // Build claude command
+        $command = ['claude', '-p', '--output-format', 'text', '--model', $model, '--permission-mode', $permissionMode];
+
+        if ($cwd === null) {
+            $cwd = getcwd() ?: null;
+        }
+
+        $process = new Process($command, $cwd);
+        $process->setInput($prompt);
+        $process->setTimeout(300);
+        $process->run();
+
+        if ($process->getExitCode() !== 0 && $process->getOutput() === '') {
+            return [
+                'type' => 'tool_response',
+                'error' => 'Claude Code failed: ' . trim($process->getErrorOutput()),
+            ];
+        }
+
+        return [
+            'type' => 'tool_response',
+            'result' => trim($process->getOutput()),
+            'model' => $model,
+            'mode' => $permissionMode,
         ];
     }
 
