@@ -56,3 +56,32 @@ memory/
 var/
 └── devbot_memory.sqlite  # Vector store
 ```
+
+## Memory Lifecycle
+
+### Session End
+
+When you quit DevBot (Ctrl+Q), the `SessionEndHandler` runs:
+
+1. Scores every conversation turn with the `RuleBasedImportanceScorer`
+2. Entries above the threshold (0.4) are persisted to long-term or episodic memory
+3. Events ("deployed", "fixed", "completed") go to episodic; facts/decisions go to long-term
+4. Topics are auto-inferred (decisions, patterns, preferences, projects)
+
+### Garbage Collection
+
+The `GarbageCollector` removes stale memories using time-based decay:
+
+- **Decay**: importance drops by 0.01 per day since last access
+- **Access boost**: frequently accessed entries resist decay (+0.02 per access, max +0.2)
+- **Threshold**: entries below 0.2 effective importance are removed
+- **Episodic**: entries older than 90 days are purged
+
+### Context Window Management
+
+The `ContextTruncationProcessor` keeps conversations within the 128k token budget:
+
+- Runs as the last input processor (priority -50)
+- Triggers at 80% usage — drops oldest conversation turns
+- Always preserves: system prompt, identity context, memory injection
+- Minimum 4 recent turns are always kept

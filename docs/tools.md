@@ -1,6 +1,6 @@
 # Tools Reference
 
-DevBot has 26 agent tools available. The LLM decides when and how to call them.
+DevBot has 27 agent tools available. The LLM decides when and how to call them.
 
 ## Memory Tools
 
@@ -77,6 +77,18 @@ DevBot has 26 agent tools available. The LLM decides when and how to call them.
 | `git_status` | Show status, log, diff, or branches. Runs in `DEVBOT_WORKDIR`. |
 | `git_commit` | Stage files and commit. Provide message and optionally specific files. |
 
+## Shell Tools
+
+| Tool | Description |
+|------|-------------|
+| `shell_exec` | Execute a shell command in the working directory. Sandboxed to an allowlist of safe commands. |
+
+### Allowed Commands
+
+`git`, `composer`, `php`, `npm`, `npx`, `node`, `make`, `grep`, `find`, `cat`, `ls`, `wc`, `head`, `tail`, `sort`, `uniq`, `diff`, `echo`, `mkdir`, `touch`, `pwd`, `date`, `which`
+
+Dangerous commands (`rm`, `sudo`, `curl`, `chmod`, etc.) are blocked.
+
 ## Web Tools
 
 | Tool | Description |
@@ -119,3 +131,5 @@ Ask DevBot naturally — it picks the right tools:
 - _"Remind me tomorrow at 10:00 to review the PR"_ → `schedule_task`
 - _"Refactor the UserController to use dependency injection"_ → `claude_delegate` (mode: dev)
 - _"Analyze the codebase and propose an architecture for the new API"_ → `claude_delegate` (mode: plan)
+- _"Run composer install and show me the output"_ → `shell_exec`
+- _"Find all PHP files that contain 'deprecated'"_ → `shell_exec`
