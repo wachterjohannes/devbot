@@ -87,7 +87,7 @@ jobs:
         run: |
           cd /tmp/frankenphp
           EMBED=${{ github.workspace }}/dist/app/ \
-          PHP_EXTENSIONS="ctype,curl,dom,fileinfo,filter,iconv,intl,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib" \
+          PHP_EXTENSIONS="ctype,curl,dom,fileinfo,filter,iconv,intl,ldap,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib" \
           PHP_VERSION="8.4" \
           ./build-static.sh
 
@@ -163,12 +163,8 @@ jobs:
             ollama pull kimi-k2.5:cloud
             ollama pull nomic-embed-text
 
-            # Configure
-            export OLLAMA_API_KEY=your-key
-            export DEVBOT_WORKDIR=/path/to/your/projects
-
-            # Setup vector store (first run only)
-            ./devbot php-cli bin/devbot ai:store:setup ai.store.sqlite.memory_store
+            # Interactive setup (config, directories, vector store)
+            ./devbot php-cli bin/devbot setup
 
             # Run
             ./devbot php-cli bin/devbot run
