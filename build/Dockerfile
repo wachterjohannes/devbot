@@ -16,7 +16,7 @@ WORKDIR /go/src/app/
 
 # Build with extensions we need (no curl — AmpHttpClient uses sockets directly)
 RUN EMBED=dist/app/ \
-    PHP_EXTENSIONS="ctype,dom,fileinfo,filter,iconv,intl,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib,zstd" \
+    PHP_EXTENSIONS="ctype,dom,fileinfo,filter,iconv,intl,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zlib" \
     PHP_VERSION="8.4" \
     ./build-static.sh
 
