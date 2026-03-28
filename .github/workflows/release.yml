@@ -61,6 +61,7 @@ jobs:
   build-macos:
     runs-on: macos-14  # ARM64 runner
     name: Build macOS ARM64
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
@@ -106,7 +107,8 @@ jobs:
           path: dist/devbot-macos-arm64
 
   release:
-    needs: [build-linux, build-macos]
+    needs: [build-linux]
+    if: always() && needs.build-linux.result == 'success'
     runs-on: ubuntu-latest
     name: Create Release
 
@@ -129,6 +131,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          fail_on_unmatched_files: false
           files: |
             dist/devbot-linux-x86_64
             dist/devbot-linux-arm64
