@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Server\ClientToolExecutor;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,9 +20,8 @@ use Symfony\Component\Process\Process;
  * Local:  bin/devbot client
  * Remote: bin/devbot client --host user@server
  *
- * When connecting remotely, an SSH tunnel is established to forward
- * the Unix socket. The client can also expose local tools back to
- * the server via a reverse listener.
+ * The client exposes local tools (filesystem, shell) that the server
+ * can call back during agent execution (reverse tool execution).
  */
 #[AsCommand(
     name: 'client',
@@ -29,6 +29,8 @@ use Symfony\Component\Process\Process;
 )]
 final class ClientCommand extends Command
 {
+    private ClientToolExecutor $toolExecutor;
+
     protected function configure(): void
     {
         $this
@@ -47,11 +49,11 @@ final class ClientCommand extends Command
         /** @var string|null $singleMessage */
         $singleMessage = $input->getArgument('message');
 
+        $this->toolExecutor = new ClientToolExecutor();
         $sshProcess = null;
         $localSocket = $socketPath;
 
         if ($host !== null) {
-            // Remote: create SSH tunnel for the Unix socket
             $localSocket = '/tmp/devbot-client-' . getmypid() . '.sock';
             $sshProcess = $this->createSshTunnel($host, $socketPath, $localSocket, $io);
 
@@ -59,11 +61,9 @@ final class ClientCommand extends Command
                 return Command::FAILURE;
             }
 
-            // Wait for tunnel to establish
             usleep(500000);
         }
 
-        // Connect to the socket
         $socket = @stream_socket_client('unix://' . $localSocket, $errno, $errstr, 5);
 
         if ($socket === false) {
@@ -73,8 +73,7 @@ final class ClientCommand extends Command
             return Command::FAILURE;
         }
 
-        // Ping to verify connection
-        $pong = $this->sendRequest($socket, ['type' => 'ping']);
+        $pong = $this->sendRequest($socket, ['type' => 'ping'], $output);
         if (($pong['type'] ?? '') !== 'pong') {
             $io->error('DevBot server not responding.');
             fclose($socket);
@@ -84,8 +83,7 @@ final class ClientCommand extends Command
         }
 
         if ($singleMessage !== null) {
-            // Non-interactive: send one message, print response, exit
-            $response = $this->sendRequest($socket, ['type' => 'chat', 'message' => $singleMessage]);
+            $response = $this->sendRequest($socket, ['type' => 'chat', 'message' => $singleMessage], $output);
             $output->writeln($response['content'] ?? $response['message'] ?? 'No response');
             fclose($socket);
             $sshProcess?->stop();
@@ -96,6 +94,7 @@ final class ClientCommand extends Command
         // Interactive mode
         $io->title('DevBot Client' . ($host !== null ? " (connected to {$host})" : ''));
         $io->text('Type a message and press Enter. Type "quit" to exit.');
+        $io->text('Your local tools (filesystem, shell) are exposed to the server.');
         $io->newLine();
 
         while (true) {
@@ -106,13 +105,13 @@ final class ClientCommand extends Command
             }
 
             if ($message === '/reset') {
-                $this->sendRequest($socket, ['type' => 'reset']);
+                $this->sendRequest($socket, ['type' => 'reset'], $output);
                 $io->success('Conversation reset.');
 
                 continue;
             }
 
-            $response = $this->sendRequest($socket, ['type' => 'chat', 'message' => $message]);
+            $response = $this->sendRequest($socket, ['type' => 'chat', 'message' => $message], $output);
 
             if (($response['type'] ?? '') === 'error') {
                 $io->error($response['message'] ?? 'Unknown error');
@@ -137,14 +136,12 @@ final class ClientCommand extends Command
 
     private function createSshTunnel(string $host, string $remoteSocket, string $localSocket, SymfonyStyle $io): ?Process
     {
-        // Clean up stale local socket
         if (file_exists($localSocket)) {
             unlink($localSocket);
         }
 
         $io->text("Establishing SSH tunnel to {$host}...");
 
-        // SSH local socket forwarding: -L local_socket:remote_socket
         $process = new Process([
             'ssh', '-N', '-L', "{$localSocket}:{$remoteSocket}", $host,
         ]);
@@ -164,25 +161,61 @@ final class ClientCommand extends Command
     }
 
     /**
+     * Send a request and read the response, handling any tool_request callbacks
+     * from the server (reverse tool execution) along the way.
+     *
      * @param resource             $socket
      * @param array<string, mixed> $request
      * @return array<string, mixed>
      */
-    private function sendRequest(mixed $socket, array $request): array
+    private function sendRequest(mixed $socket, array $request, OutputInterface $output): array
     {
         $json = json_encode($request, \JSON_UNESCAPED_UNICODE) . "\n";
         fwrite($socket, $json);
 
-        // Read response (wait up to 5 minutes for agent calls)
+        return $this->readResponse($socket, $output);
+    }
+
+    /**
+     * Read from socket, handling tool_request messages by executing locally
+     * and sending back tool_response, until a final response arrives.
+     *
+     * @param resource $socket
+     * @return array<string, mixed>
+     */
+    private function readResponse(mixed $socket, OutputInterface $output): array
+    {
         stream_set_timeout($socket, 300);
-        $line = fgets($socket);
 
-        if ($line === false) {
-            return ['type' => 'error', 'message' => 'No response from server'];
+        while (true) {
+            $line = fgets($socket);
+
+            if ($line === false) {
+                return ['type' => 'error', 'message' => 'No response from server'];
+            }
+
+            $message = json_decode(trim($line), true);
+
+            if (!\is_array($message)) {
+                return ['type' => 'error', 'message' => 'Invalid response'];
+            }
+
+            // Handle reverse tool execution
+            if (($message['type'] ?? '') === 'tool_request') {
+                $tool = $message['tool'] ?? 'unknown';
+                $op = $message['operation'] ?? 'unknown';
+                $output->writeln("<fg=gray>  [client] executing {$tool}:{$op}...</>");
+
+                $result = $this->toolExecutor->execute($message);
+                $resultJson = json_encode($result, \JSON_UNESCAPED_UNICODE) . "\n";
+                fwrite($socket, $resultJson);
+
+                // Continue reading — the final response comes after tool execution
+                continue;
+            }
+
+            // Any other message type is the final response
+            return $message;
         }
-
-        $response = json_decode(trim($line), true);
-
-        return \is_array($response) ? $response : ['type' => 'error', 'message' => 'Invalid response'];
     }
 }

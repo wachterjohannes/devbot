@@ -58,6 +58,9 @@ services:
             $platform: '@devbot.claude_code.platform'
             $workingDirectory: '%devbot.shell.working_directory%'
 
+    # Client connection registry (for reverse tool execution)
+    App\Server\ClientConnectionRegistry: ~
+
     # Kanban Manager
     App\Kanban\KanbanManager:
         arguments:

@@ -9,14 +9,13 @@ use Revolt\EventLoop;
 /**
  * Unix socket server for headless mode.
  * Accepts JSON commands, processes them via a handler, returns JSON responses.
+ * Registers connected clients in the registry for reverse tool execution.
  *
  * Protocol (newline-delimited JSON):
- *   Request:  {"type": "chat", "message": "..."}\n
- *   Response: {"type": "response", "content": "..."}\n
- *   Request:  {"type": "tool_call", "tool": "...", "args": {...}}\n
- *   Response: {"type": "tool_result", "result": {...}}\n
- *   Request:  {"type": "ping"}\n
- *   Response: {"type": "pong"}\n
+ *   Client→Server: {"type": "chat|ping|reset", ...}\n
+ *   Server→Client: {"type": "response|pong|ok|error", ...}\n
+ *   Server→Client: {"type": "tool_request", "tool": "...", "operation": "...", "args": {...}}\n
+ *   Client→Server: {"type": "tool_response", "result": {...}}\n
  */
 final class SocketServer
 {
@@ -31,6 +30,7 @@ final class SocketServer
     public function __construct(
         private readonly string $socketPath,
         private readonly RequestHandler $handler,
+        private readonly ClientConnectionRegistry $registry,
     ) {
     }
 
@@ -39,7 +39,6 @@ final class SocketServer
      */
     public function start(): void
     {
-        // Clean up stale socket
         if (file_exists($this->socketPath)) {
             unlink($this->socketPath);
         }
@@ -58,7 +57,6 @@ final class SocketServer
         stream_set_blocking($socket, false);
         $this->socket = $socket;
 
-        // Accept connections in the event loop
         $this->callbackId = EventLoop::onReadable($socket, function ($callbackId, $socket): void {
             $client = @stream_socket_accept($socket, 0);
 
@@ -69,12 +67,18 @@ final class SocketServer
             stream_set_blocking($client, false);
             $this->clients[] = $client;
 
+            // Register client for reverse tool execution
+            $connection = new ClientConnection($client);
+            $this->registry->register($connection);
+
             $buffer = '';
-            EventLoop::onReadable($client, function (string $cbId) use ($client, &$buffer): void {
+            EventLoop::onReadable($client, function (string $cbId) use ($client, $connection, &$buffer): void {
                 $data = @fread($client, 8192);
 
                 if ($data === false || $data === '') {
                     EventLoop::cancel($cbId);
+                    $connection->disconnect();
+                    $this->registry->unregister($connection);
                     $this->removeClient($client);
 
                     return;

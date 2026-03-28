@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Heartbeat\HeartbeatLoop;
+use App\Server\ClientConnectionRegistry;
 use App\Server\RequestHandler;
 use App\Server\SocketServer;
 use App\Tui\App;
@@ -30,6 +31,7 @@ final class DevBotCommand extends Command
         private readonly App $app,
         private readonly HeartbeatLoop $heartbeatLoop,
         private readonly RequestHandler $requestHandler,
+        private readonly ClientConnectionRegistry $clientRegistry,
     ) {
         parent::__construct();
     }
@@ -63,7 +65,7 @@ final class DevBotCommand extends Command
         $output->writeln('  Press Ctrl+C to stop');
         $output->writeln('');
 
-        $server = new SocketServer($socketPath, $this->requestHandler);
+        $server = new SocketServer($socketPath, $this->requestHandler, $this->clientRegistry);
         $server->start();
         $this->heartbeatLoop->start();
 

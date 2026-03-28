@@ -47,7 +47,7 @@ php bin/devbot run
 | **F6** | Cycle focus between widgets |
 | **Ctrl+Q** | Quit |
 
-## 27 Agent Tools
+## 30 Agent Tools
 
 | Category | Tools |
 |----------|-------|
@@ -59,6 +59,7 @@ php bin/devbot run
 | **Web** (2) | web_search, web_fetch |
 | **Shell** (1) | shell_exec (sandboxed with command allowlist) |
 | **Claude** (1) | claude_delegate (plan/dev modes, model selection) |
+| **Client** (3) | client_exec, client_file_read, client_file_list (reverse execution on connected client) |
 
 ## Documentation
 

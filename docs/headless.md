@@ -76,6 +76,35 @@ Communication uses newline-delimited JSON over Unix socket:
 // Reset conversation
 {"type": "reset"}
 {"type": "ok", "message": "Conversation reset"}
+
+// Reverse tool execution (server → client)
+{"type": "tool_request", "tool": "shell", "operation": "exec", "args": {"command": "ls -la"}, "id": "abc123"}
+{"type": "tool_response", "output": "total 42\n...", "exit_code": 0, "error": ""}
+```
+
+## Reverse Tool Execution
+
+When a client is connected, the server can execute operations on the client's local machine. The agent has 3 client tools:
+
+| Tool | Description |
+|------|-------------|
+| `client_exec` | Run a shell command on the client (same allowlist as `shell_exec`) |
+| `client_file_read` | Read a file from the client's filesystem |
+| `client_file_list` | List files in a directory on the client |
+
+The flow:
+1. You ask DevBot (running on server) to do something with your local files
+2. The agent calls `client_exec` or `client_file_read`
+3. The server sends a `tool_request` through the socket to your client
+4. The client executes the operation locally and returns the result
+5. The agent receives the result and continues
+
+Example:
+```
+You: List the PHP files in my project
+DevBot: [calls client_file_list with path /home/user/project]
+        [client executes locally, returns file list]
+        Here are the PHP files in your project: ...
 ```
 
 ## V-Server Deployment
@@ -120,8 +149,12 @@ V-Server (headless)                     Local machine (client)
 │    --headless         │   SSH tunnel  │    --host user@server │
 │                       │◄─────────────►│                       │
 │  HeartbeatLoop        │  Unix socket  │  Interactive chat     │
-│  Agent + 27 tools     │  JSON proto   │                       │
-│  Skills/scheduler     │               │                       │
-│  SocketServer         │               │                       │
+│  Agent + 30 tools     │  JSON proto   │  Exposes local tools: │
+│  Skills/scheduler     │               │   - filesystem        │
+│  SocketServer         │  tool_request │   - shell (sandboxed) │
+│                       ├──────────────►│                       │
+│  client_exec ─────────┤  tool_resp   │  ClientToolExecutor   │
+│  client_file_read     │◄──────────────┤  executes locally     │
+│  client_file_list     │               │                       │
 └──────────────────────┘               └──────────────────────┘
 ```
