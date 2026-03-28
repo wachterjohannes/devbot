@@ -6,6 +6,8 @@
 - **Ollama** running locally — [ollama.com](https://ollama.com)
 - **Ollama API key** (free) for web search — [ollama.com/settings/keys](https://ollama.com/settings/keys)
 - **Claude Code CLI** installed and authenticated (for coding delegation) — [claude.ai/download](https://claude.ai/download)
+- **gh CLI** (optional) for GitHub integration — [cli.github.com](https://cli.github.com)
+- **glab CLI** (optional) for GitLab integration — [gitlab.com/gitlab-org/cli](https://gitlab.com/gitlab-org/cli)
 
 Pull the required models:
 

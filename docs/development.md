@@ -49,15 +49,19 @@ src/
 ├── Tool/                # Agent tools (#[AsTool])
 │   ├── Memory/          # 8 memory tools (search, grep, read, prune, add, remove, update, list)
 │   ├── Kanban/          # 4 kanban tools
-│   ├── Git/             # 2 git tools (status, commit)
+│   ├── Git/             # 4 git tools (status, commit, github, gitlab)
 │   ├── Web/             # 2 web tools (search, fetch)
 │   ├── Skill/           # 6 skill tools (create, update, run, list, toggle, delete)
 │   ├── Heartbeat/       # 3 scheduled task tools (schedule, list, cancel)
 │   ├── CodingAgent/     # 1 Claude Code delegation tool
+│   ├── Client/          # 4 client tools (exec, file_read, file_list, claude_delegate)
 │   └── Shell/           # 1 shell exec tool
 ├── Server/              # Headless mode socket server
-│   ├── SocketServer.php       # Unix socket server (Revolt event loop)
-│   └── RequestHandler.php     # JSON request routing to agent
+│   ├── SocketServer.php           # Unix socket server (Revolt event loop)
+│   ├── RequestHandler.php         # JSON request routing to agent
+│   ├── ClientConnection.php       # Bidirectional client communication
+│   ├── ClientConnectionRegistry.php # Tracks connected clients
+│   └── ClientToolExecutor.php     # Executes tool requests on the client
 ├── EventListener/       # Event listeners
 │   └── ToolExecutionLogger.php  # Logs tool calls to file + in-memory buffer
 └── Bridge/              # External service bridges

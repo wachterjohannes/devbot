@@ -209,6 +209,45 @@ A heartbeat skill that:
 3. Stores the review in memory via `memory_add`
 4. Creates a kanban card if issues were found
 
+## GitHub & GitLab Integration
+
+### Responding to PR Comments
+
+> "Check the latest comments on PR #42 and post a reply if there are questions"
+
+DevBot calls `github` with `list_comments` on issue 42, reads the comments, then uses `post_comment` to reply.
+
+### Issue Triage
+
+> "List all open GitHub issues and create kanban cards for any labeled 'bug'"
+
+DevBot uses `github` (operation: `list_issues`, state: `open`), filters by label, and creates cards with `kanban_create_card`.
+
+### GitLab MR Review
+
+> "Check the latest merge requests on GitLab and summarize them"
+
+```
+-> gitlab(operation: "list_mrs", state: "opened")
+```
+
+DevBot lists open MRs and provides a summary with titles, authors, and review status.
+
+### Automated Comment Responder Skill
+
+> "Create a skill that every 15 minutes checks for new comments on GitHub issue #10 and posts a helpful response"
+
+```markdown
+# Skill: github-comment-responder
+## Trigger
+interval: 900
+## Steps
+1. Use github with operation list_comments on issue 10
+2. Check if there are new comments since last run (use memory_grep)
+3. If new comments found, analyze them and post a helpful response via github post_comment
+4. Store the latest comment timestamp in memory
+```
+
 ## Headless Mode & Remote Access
 
 ### V-Server Deployment

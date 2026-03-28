@@ -22,7 +22,7 @@ php bin/devbot run --headless --socket /var/run/devbot.sock
 What runs in headless mode:
 - Heartbeat loop (scheduled skills, one-off tasks)
 - Unix socket server accepting JSON commands
-- Full agent with all 27 tools
+- Full agent with all 33 tools
 
 The server listens on `/tmp/devbot.sock` by default.
 
@@ -84,13 +84,14 @@ Communication uses newline-delimited JSON over Unix socket:
 
 ## Reverse Tool Execution
 
-When a client is connected, the server can execute operations on the client's local machine. The agent has 3 client tools:
+When a client is connected, the server can execute operations on the client's local machine. The agent has 4 client tools:
 
 | Tool | Description |
 |------|-------------|
 | `client_exec` | Run a shell command on the client (same allowlist as `shell_exec`) |
 | `client_file_read` | Read a file from the client's filesystem |
 | `client_file_list` | List files in a directory on the client |
+| `client_claude_delegate` | Run Claude Code on the client's machine (coding, planning, analysis) |
 
 The flow:
 1. You ask DevBot (running on server) to do something with your local files
@@ -149,12 +150,13 @@ V-Server (headless)                     Local machine (client)
 │    --headless         │   SSH tunnel  │    --host user@server │
 │                       │◄─────────────►│                       │
 │  HeartbeatLoop        │  Unix socket  │  Interactive chat     │
-│  Agent + 30 tools     │  JSON proto   │  Exposes local tools: │
+│  Agent + 33 tools     │  JSON proto   │  Exposes local tools: │
 │  Skills/scheduler     │               │   - filesystem        │
 │  SocketServer         │  tool_request │   - shell (sandboxed) │
-│                       ├──────────────►│                       │
+│                       ├──────────────►│   - claude code       │
 │  client_exec ─────────┤  tool_resp   │  ClientToolExecutor   │
 │  client_file_read     │◄──────────────┤  executes locally     │
 │  client_file_list     │               │                       │
+│  client_claude_deleg. │               │                       │
 └──────────────────────┘               └──────────────────────┘
 ```

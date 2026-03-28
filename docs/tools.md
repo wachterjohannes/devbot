@@ -1,6 +1,6 @@
 # Tools Reference
 
-DevBot has 27 agent tools available. The LLM decides when and how to call them.
+DevBot has 33 agent tools available. The LLM decides when and how to call them.
 
 ## Memory Tools
 
@@ -77,6 +77,36 @@ DevBot has 27 agent tools available. The LLM decides when and how to call them.
 | `git_status` | Show status, log, diff, or branches. Runs in `DEVBOT_WORKDIR`. |
 | `git_commit` | Stage files and commit. Provide message and optionally specific files. |
 
+## GitHub & GitLab Tools
+
+| Tool | Description |
+|------|-------------|
+| `github` | Interact with GitHub via the `gh` CLI: list issues/PRs, view details, read and post comments. Requires `gh` installed and authenticated. |
+| `gitlab` | Interact with GitLab via the `glab` CLI: list issues/MRs, view details, read and post comments. Requires `glab` installed and authenticated. |
+
+### GitHub Operations
+
+| Operation | Description |
+|-----------|-------------|
+| `list_issues` | List issues (filterable by state: open, closed, all) |
+| `list_prs` | List pull requests |
+| `view_issue` | View a single issue by number |
+| `view_pr` | View a single PR by number |
+| `list_comments` | List comments on an issue or PR |
+| `post_comment` | Post a comment on an issue or PR |
+
+### GitLab Operations
+
+| Operation | Description |
+|-----------|-------------|
+| `list_issues` | List issues (filterable by state: opened, closed, all) |
+| `list_mrs` | List merge requests |
+| `view_issue` | View a single issue by number |
+| `view_mr` | View a single MR by number |
+| `list_comments` | List comments on an issue |
+| `post_comment` | Post a comment on an issue |
+| `mr_comment` | Post a comment on a merge request |
+
 ## Shell Tools
 
 | Tool | Description |
@@ -115,6 +145,19 @@ Dangerous commands (`rm`, `sudo`, `curl`, `chmod`, etc.) are blocked.
 | `list_scheduled` | List all upcoming scheduled tasks. |
 | `cancel_scheduled` | Cancel a scheduled task by ID. |
 
+## Client Tools (Headless Mode)
+
+These tools are only available when a client is connected to the headless server via `bin/devbot client`. They execute operations on the client's local machine through reverse tool execution.
+
+| Tool | Description |
+|------|-------------|
+| `client_exec` | Execute a shell command on the connected client's machine. Same allowlist as `shell_exec`. |
+| `client_file_read` | Read a file from the connected client's filesystem. |
+| `client_file_list` | List files in a directory on the connected client's machine. |
+| `client_claude_delegate` | Run Claude Code on the connected client's machine. Claude has access to the client's local filesystem and dev environment. Supports plan/dev/auto modes and model selection. |
+
+See [headless.md](headless.md) for details on the reverse tool execution protocol.
+
 ## Usage Examples
 
 Ask DevBot naturally — it picks the right tools:
@@ -133,3 +176,8 @@ Ask DevBot naturally — it picks the right tools:
 - _"Analyze the codebase and propose an architecture for the new API"_ → `claude_delegate` (mode: plan)
 - _"Run composer install and show me the output"_ → `shell_exec`
 - _"Find all PHP files that contain 'deprecated'"_ → `shell_exec`
+- _"List the open issues on our GitHub repo"_ → `github` (operation: list_issues)
+- _"Post a comment on PR #42 saying the fix looks good"_ → `github` (operation: post_comment)
+- _"Show me the latest merge requests on GitLab"_ → `gitlab` (operation: list_mrs)
+- _"Run the test suite on the client's machine"_ → `client_exec`
+- _"Ask Claude on the client to review the auth module"_ → `client_claude_delegate`

@@ -1138,7 +1138,7 @@ mcp:
 
 ### Phase 3: Kanban + Git Integration (Week 5-6)
 
-**Status: Partial** -- Kanban data model, TUI widget, tools, and local git tools are done. Missing: GitHub API integration (GitHubApiService, GitHubTool), GitLab API integration (GitLabApiService, GitLabTool), issue sync.
+**Status: Partial** -- Kanban data model, TUI widget, tools, and local git tools are done. GitHub and GitLab tools implemented via `gh`/`glab` CLI wrappers (not API packages). Missing: issue sync (GitHubIssueSyncer, GitLabIssueSyncer).
 
 **Goal**: Working kanban board with GitHub/GitLab sync.
 
@@ -1243,7 +1243,7 @@ mcp:
 
 ### Phase 6: Claude Code Subagent + MCP Server + External Tools (Week 11-12)
 
-**Status: Partial** -- CodingDelegateTool done (delegates to Claude Code with plan/dev/auto modes). Missing: DevBot as MCP server, MCP client connections, tool discovery UI.
+**Status: Partial** -- CodingDelegateTool done (delegates to Claude Code with plan/dev/auto modes). ClientClaudeDelegateTool done (delegates Claude Code to connected client's machine). Missing: DevBot as MCP server, MCP client connections, tool discovery UI.
 
 **Goal**: Wire up Claude Code as coding subagent, DevBot acts as MCP server and connects to external MCP servers.
 
@@ -1271,7 +1271,7 @@ mcp:
 
 ### Phase 7: Polish + Hardening (Week 13-14)
 
-**Status: Partial** -- Context window management done (ContextWindowManager + ContextTruncationProcessor), unit and integration tests written (86 tests), headless mode fully implemented (SocketServer + RequestHandler + ClientCommand with SSH tunneling). Missing: comprehensive error handling, full test coverage, systemd service file, ARCHITECTURE.md.
+**Status: Partial** -- Context window management done (ContextWindowManager + ContextTruncationProcessor), unit and integration tests written (86 tests), headless mode fully implemented (SocketServer + RequestHandler + ClientCommand with SSH tunneling + reverse tool execution with 4 client tools). Missing: comprehensive error handling, full test coverage, systemd service file, ARCHITECTURE.md.
 
 1. **Context window management**
    - Smart truncation strategy for long conversations

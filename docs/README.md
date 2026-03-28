@@ -4,7 +4,7 @@
 
 - [Getting Started](getting-started.md) — Prerequisites, installation, first run
 - [Configuration](configuration.md) — Environment variables, AI settings, identity files
-- [Tools Reference](tools.md) — All 27 agent tools with descriptions and examples
+- [Tools Reference](tools.md) — All 33 agent tools with descriptions and examples
 - [Memory System](memory.md) — Four-tier memory, agentic search, lifecycle, context management
 - [Skills & Heartbeat](skills.md) — Reusable workflows, scheduled tasks, reminders
 - [Use Cases](use-cases.md) — Real-world examples and workflow patterns

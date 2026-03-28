@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Memory\Store;
 
 use App\Memory\Model\MemoryEntry;
-use App\Memory\Model\MemoryMetadata;
-use App\Memory\Model\MemoryType;
 
 /**
  * Chronological event log stored as JSON files per day.
