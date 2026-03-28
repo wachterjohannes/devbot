@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Tui;
 
 use App\Heartbeat\HeartbeatLoop;
+use App\Identity\Updater\ProfileLearner;
 use App\Kanban\KanbanManager;
+use App\Memory\Lifecycle\SessionEndHandler;
 use App\Memory\MemoryManager;
 use App\Tui\Widget\ChatWidget;
 use App\Tui\Widget\KanbanWidget;
@@ -44,6 +46,8 @@ final class App
         private readonly HeartbeatLoop $heartbeatLoop,
         private readonly KanbanManager $kanbanManager,
         private readonly MemoryManager $memoryManager,
+        private readonly SessionEndHandler $sessionEndHandler,
+        private readonly ProfileLearner $profileLearner,
     ) {
     }
 
@@ -150,6 +154,10 @@ final class App
         $this->heartbeatLoop->start();
         $tui->run();
         $this->heartbeatLoop->stop();
+
+        // Session cleanup: extract learnings and profile insights
+        $this->sessionEndHandler->handle();
+        $this->profileLearner->extractInsights();
     }
 
     private function renderTabBar(): string
