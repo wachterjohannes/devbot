@@ -2,20 +2,39 @@
 
 AI-powered development process agent built on Symfony/TUI and Symfony/AI.
 
-## Quick Start
+## Quick Start (Standalone Binary)
+
+```bash
+# Download (Linux x86_64 — see Releases for other platforms)
+curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-x86_64
+chmod +x devbot
+
+# Prerequisites
+ollama pull kimi-k2.5:cloud
+ollama pull nomic-embed-text
+
+# Interactive setup (creates config, directories, vector store)
+./devbot php-cli bin/devbot setup
+
+# Run
+./devbot php-cli bin/devbot run
+```
+
+No PHP, Composer, or dependencies required -- everything is bundled via [FrankenPHP](https://frankenphp.dev).
+
+## Quick Start (From Source)
 
 ```bash
 # Prerequisites
 ollama pull kimi-k2.5:cloud
 ollama pull nomic-embed-text
 
-# Configure
-cp .env .env.local
-# Edit .env.local with your OLLAMA_API_KEY and paths
-
-# Install & setup
+# Clone & install
+git clone https://github.com/wachterjohannes/devbot.git && cd devbot
 composer install
-php bin/devbot ai:store:setup ai.store.sqlite.memory_store
+
+# Interactive setup
+php bin/devbot setup
 
 # Run
 php bin/devbot run
@@ -25,11 +44,12 @@ php bin/devbot run
 
 | Command | Description |
 |---------|-------------|
+| `php bin/devbot setup` | Interactive setup wizard (config, dirs, vector store) |
+| `php bin/devbot setup --headless` | Setup including systemd service for server deployment |
 | `php bin/devbot run` | Start TUI chat interface |
 | `php bin/devbot run --headless` | Headless mode: heartbeat + socket server |
 | `php bin/devbot client` | Connect to headless server (local) |
 | `php bin/devbot client --host user@server` | Connect to headless server (remote via SSH) |
-| `php bin/devbot ai:store:setup ai.store.sqlite.memory_store` | Set up SQLite vector store |
 | `php vendor/bin/phpunit` | Run tests |
 | `php vendor/bin/phpstan analyse` | Static analysis |
 | `php vendor/bin/php-cs-fixer fix` | Fix code style |
@@ -109,6 +129,12 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - `patches/ollama-ndjson-streaming.patch` — NDJSON streaming ([PR #1827](https://github.com/symfony/ai/pull/1827))
 - `patches/platform-ndjson-result.patch` — NdjsonHttpResult class ([PR #1827](https://github.com/symfony/ai/pull/1827))
 - `patches/ai-bundle-traceable-store-managed.patch` — TraceableStore setup/drop ([PR #1828](https://github.com/symfony/ai/pull/1828))
+
+### Standalone Binaries
+- FrankenPHP-embedded static binaries (no PHP required)
+- Linux x86_64, Linux ARM64, macOS ARM64
+- GitHub Actions CI/CD for automated releases
+- Single binary includes PHP 8.4, all extensions, and all dependencies
 
 ### Quality
 - PHPStan level 6: 0 errors

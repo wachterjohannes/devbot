@@ -16,40 +16,70 @@ ollama pull kimi-k2.5:cloud    # Main reasoning model
 ollama pull nomic-embed-text   # Embedding model for memory search
 ```
 
-## Installation
+## Option A: Standalone Binary (recommended)
+
+Download the latest release for your platform:
 
 ```bash
-git clone <repo-url> devbot && cd devbot
+# Linux x86_64
+curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-x86_64
+
+# Linux ARM64
+curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-arm64
+
+# macOS ARM64 (Apple Silicon)
+curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-macos-arm64
+
+chmod +x devbot
+```
+
+Run the interactive setup wizard:
+
+```bash
+# Guided setup: configures .env.local, creates directories, initializes vector store
+./devbot php-cli bin/devbot setup
+
+# Run
+./devbot php-cli bin/devbot run
+```
+
+No PHP installation required -- everything is bundled in the binary.
+
+## Option B: From Source (for development)
+
+```bash
+git clone https://github.com/wachterjohannes/devbot.git && cd devbot
 composer install
 ```
 
-## Configuration
+Run the interactive setup wizard:
 
 ```bash
-cp .env .env.local
-```
+# Guided setup: configures .env.local, creates directories, initializes vector store
+php bin/devbot setup
 
-Edit `.env.local`:
-
-```env
-OLLAMA_HOST_URL=http://localhost:11434
-OLLAMA_API_KEY=your-ollama-api-key
-DEVBOT_WORKDIR=/path/to/your/project
-```
-
-## First Run
-
-Set up the vector store for memory:
-
-```bash
-php bin/devbot ai:store:setup ai.store.sqlite.memory_store
-```
-
-Start DevBot:
-
-```bash
+# Run
 php bin/devbot run
 ```
+
+## Server Deployment (headless)
+
+For deploying DevBot on a V-Server with systemd:
+
+```bash
+# Setup with systemd service generation
+php bin/devbot setup --headless
+
+# Or for automated/CI deployments (uses env vars, no prompts)
+php bin/devbot setup --headless --non-interactive
+```
+
+The `--headless` flag additionally:
+- Generates a systemd service file with security hardening
+- Optionally installs it (requires sudo)
+- Configures socket path and environment forwarding
+
+See [Headless Mode & Client](headless.md) for full server/client documentation.
 
 ## TUI Controls
 

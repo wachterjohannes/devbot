@@ -1,5 +1,6 @@
 /vendor/
 /var/
+/dist/
 /.env.local
 /.php-cs-fixer.cache
 /.phpunit.result.cache

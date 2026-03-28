@@ -125,6 +125,11 @@ services:
         arguments:
             $logFile: '%kernel.project_dir%/var/log/tool_calls.jsonl'
 
+    # Setup command
+    App\Command\SetupCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
     # Memory injection processor
     App\Agent\Processor\MemoryInjectionProcessor:
         arguments:

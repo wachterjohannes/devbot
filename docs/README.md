@@ -13,3 +13,4 @@
 ## Developer Guide
 
 - [Development](development.md) — Project structure, conventions, testing, vendor patches
+- [Building](building.md) — Building standalone binaries with FrankenPHP

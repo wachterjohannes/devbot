@@ -110,23 +110,57 @@ DevBot: [calls client_file_list with path /home/user/project]
 
 ## V-Server Deployment
 
-### systemd service
+### Automated setup
+
+The setup wizard handles everything including systemd service generation:
+
+```bash
+# Interactive: prompts for config, generates and installs systemd service
+php bin/devbot setup --headless
+
+# Non-interactive: uses env vars, skips prompts (for CI/automation)
+OLLAMA_API_KEY=your-key DEVBOT_WORKDIR=/opt/projects \
+  php bin/devbot setup --headless --non-interactive
+```
+
+The generated systemd service includes:
+- Automatic restart on failure
+- Environment variable forwarding from `.env.local`
+- Security hardening (`NoNewPrivileges`, `ProtectSystem=strict`, `ReadWritePaths`)
+- Ollama service dependency
+
+### Manual systemd service
+
+If you prefer to write it manually:
 
 ```ini
 [Unit]
 Description=DevBot AI Agent
-After=network.target
+After=network.target ollama.service
+Wants=ollama.service
 
 [Service]
 Type=simple
 User=devbot
 WorkingDirectory=/opt/devbot
-ExecStart=/usr/bin/php bin/devbot run --headless
+ExecStart=php bin/devbot run --headless --socket /var/run/devbot/devbot.sock
 Restart=always
 RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/devbot/var /opt/devbot/memory /opt/devbot/kanban /opt/devbot/heartbeat /opt/devbot/skills
+ReadWritePaths=/var/run/devbot
 
 [Install]
 WantedBy=multi-user.target
+```
+
+### Enable and start
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now devbot
+sudo journalctl -u devbot -f   # watch logs
 ```
 
 ### Connect from your machine

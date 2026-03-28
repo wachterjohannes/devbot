@@ -1,0 +1,52 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Standalone entry point for FrankenPHP-embedded DevBot.
+ *
+ * When running as a standalone binary, this script detects
+ * that it's running inside FrankenPHP and adjusts paths accordingly.
+ * Usage: ./devbot run | ./devbot client | ./devbot ai:store:setup ...
+ */
+
+declare(strict_types=1);
+
+use App\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+
+// Detect FrankenPHP embedded app directory
+$appDir = $_SERVER['APP_DIR'] ?? (function (): string {
+    // FrankenPHP embeds the app — check if we're running inside it
+    // The embedded app root is the directory containing this script's parent
+    $dir = dirname(__DIR__);
+
+    // If vendor exists relative to us, we're in the right place
+    if (is_file($dir . '/vendor/autoload_runtime.php')) {
+        return $dir;
+    }
+
+    // Fallback: current working directory
+    $cwd = getcwd();
+    if ($cwd !== false && is_file($cwd . '/vendor/autoload_runtime.php')) {
+        return $cwd;
+    }
+
+    return $dir;
+})();
+
+if (!is_file($appDir . '/vendor/autoload_runtime.php')) {
+    fwrite(STDERR, "Cannot locate vendor/autoload_runtime.php\n");
+    exit(1);
+}
+
+// Set project dir for Symfony
+$_SERVER['KERNEL_PROJECT_DIR'] = $appDir;
+$_ENV['KERNEL_PROJECT_DIR'] = $appDir;
+
+require_once $appDir . '/vendor/autoload_runtime.php';
+
+return function (array $context) {
+    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+
+    return new Application($kernel);
+};
