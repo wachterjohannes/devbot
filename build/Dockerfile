@@ -5,7 +5,7 @@
 
 ARG TARGETARCH=amd64
 
-FROM --platform=linux/${TARGETARCH} dunglas/frankenphp:static-builder AS builder
+FROM --platform=linux/${TARGETARCH} dunglas/frankenphp:static-builder-gnu AS builder
 
 WORKDIR /go/src/app/dist/app
 
