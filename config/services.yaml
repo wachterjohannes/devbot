@@ -72,6 +72,11 @@ services:
         arguments:
             $workingDirectory: '%devbot.shell.working_directory%'
 
+    App\Tool\Shell\ShellExecTool:
+        arguments:
+            $workingDirectory: '%devbot.shell.working_directory%'
+            $timeout: 30
+
     # Skill Manager
     App\Skill\SkillManager:
         arguments:
