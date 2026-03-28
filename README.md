@@ -40,6 +40,7 @@ php bin/devbot run
 | **F1** | Chat tab |
 | **F2** | Kanban board tab |
 | **F3** | Memory browser tab |
+| **F4** | Tool execution logs tab |
 | **Arrow keys** | Navigate lists (board, memory) |
 | **F6** | Cycle focus between widgets |
 | **Ctrl+Q** | Quit |
@@ -91,6 +92,7 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - F1 Chat: streaming with thinking token animation
 - F2 Board: kanban columns with cards, priorities, labels
 - F3 Memory: entry list with content viewer
+- F4 Logs: tool execution log with status, arguments, results (persisted to `var/log/tool_calls.jsonl`)
 
 ### Skills + Heartbeat
 - Markdown-based reusable workflows the bot creates and runs

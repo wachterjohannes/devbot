@@ -58,3 +58,6 @@ php bin/devbot run
 | **F1** | Chat tab |
 | **F2** | Kanban board tab |
 | **F3** | Memory browser tab |
+| **F4** | Tool execution logs tab |
+| **Arrow keys** | Navigate lists (board, memory) |
+| **F6** | Cycle focus between widgets |

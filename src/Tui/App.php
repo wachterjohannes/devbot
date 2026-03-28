@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tui;
 
+use App\EventListener\ToolExecutionLogger;
 use App\Heartbeat\HeartbeatLoop;
 use App\Identity\Updater\ProfileLearner;
 use App\Kanban\KanbanManager;
@@ -11,6 +12,7 @@ use App\Memory\Lifecycle\SessionEndHandler;
 use App\Memory\MemoryManager;
 use App\Tui\Widget\ChatWidget;
 use App\Tui\Widget\KanbanWidget;
+use App\Tui\Widget\LogWidget;
 use App\Tui\Widget\MemoryBrowserWidget;
 use App\Tui\Widget\StatusBarWidget;
 use Symfony\AI\Agent\AgentInterface;
@@ -23,7 +25,7 @@ use Symfony\Component\Tui\Widget\TextWidget;
 /**
  * Root TUI application with tabbed layout.
  *
- * Tabs: F1 = Chat, F2 = Board, F3 = Memory
+ * Tabs: F1 = Chat, F2 = Board, F3 = Memory, F4 = Logs
  * Heartbeat runs alongside the TUI for scheduled tasks.
  */
 final class App
@@ -31,11 +33,13 @@ final class App
     private const TAB_CHAT = 0;
     private const TAB_BOARD = 1;
     private const TAB_MEMORY = 2;
+    private const TAB_LOGS = 3;
 
     private const TAB_CONFIG = [
         self::TAB_CHAT => ['key' => 'F1', 'label' => 'Chat', 'fkey' => 'f1', 'color' => '36'],
         self::TAB_BOARD => ['key' => 'F2', 'label' => 'Board', 'fkey' => 'f2', 'color' => '33'],
         self::TAB_MEMORY => ['key' => 'F3', 'label' => 'Memory', 'fkey' => 'f3', 'color' => '32'],
+        self::TAB_LOGS => ['key' => 'F4', 'label' => 'Logs', 'fkey' => 'f4', 'color' => '35'],
     ];
 
     private int $activeTab = self::TAB_CHAT;
@@ -48,6 +52,7 @@ final class App
         private readonly MemoryManager $memoryManager,
         private readonly SessionEndHandler $sessionEndHandler,
         private readonly ProfileLearner $profileLearner,
+        private readonly ToolExecutionLogger $toolLogger,
     ) {
     }
 
@@ -93,7 +98,18 @@ final class App
         $memoryView->setStyle(new Style(hidden: true));
         $memoryView->add($memoryBrowser);
 
-        // Tab bar — single TextWidget with inline ANSI colors
+        // Logs view
+        $logWidget = new LogWidget($this->toolLogger);
+        $logWidget->setId('log-widget');
+        $logWidget->expandVertically(true);
+
+        $logsView = new ContainerWidget();
+        $logsView->setId('logs-view');
+        $logsView->expandVertically(true);
+        $logsView->setStyle(new Style(hidden: true));
+        $logsView->add($logWidget);
+
+        // Tab bar
         $this->tabBar = new TextWidget($this->renderTabBar());
         $this->tabBar->setId('tab-bar');
         $this->tabBar->addStyleClass('bg-gray-800');
@@ -111,6 +127,7 @@ final class App
         $layout->add($chatView);
         $layout->add($boardView);
         $layout->add($memoryView);
+        $layout->add($logsView);
         $layout->add($statusBar);
 
         /** @var array<int, ContainerWidget> $views */
@@ -118,11 +135,12 @@ final class App
             self::TAB_CHAT => $chatView,
             self::TAB_BOARD => $boardView,
             self::TAB_MEMORY => $memoryView,
+            self::TAB_LOGS => $logsView,
         ];
 
         // Tab switching
         $parser = new KeyParser();
-        $tui->onInput(function (string $data) use ($tui, $parser, $views, $chat, $kanban, $memoryBrowser): bool {
+        $tui->onInput(function (string $data) use ($tui, $parser, $views, $chat, $kanban, $memoryBrowser, $logWidget): bool {
             foreach (self::TAB_CONFIG as $tab => $config) {
                 if ($parser->matches($data, $config['fkey']) && $this->activeTab !== $tab) {
                     $this->activeTab = $tab;
@@ -137,6 +155,7 @@ final class App
                         self::TAB_CHAT => $chat->focusEditor(),
                         self::TAB_BOARD => $kanban->refresh(),
                         self::TAB_MEMORY => $memoryBrowser->refresh(),
+                        self::TAB_LOGS => $logWidget->refresh(),
                     };
 
                     $tui->requestRender(true);
@@ -155,23 +174,19 @@ final class App
         $tui->run();
         $this->heartbeatLoop->stop();
 
-        // Session cleanup: extract learnings and profile insights
+        // Session cleanup
         $this->sessionEndHandler->handle();
         $this->profileLearner->extractInsights();
     }
 
     private function renderTabBar(): string
     {
-        // Logo
         $bar = "\033[1;97;46m DevBot \033[0m ";
 
-        // Tabs
         foreach (self::TAB_CONFIG as $index => $config) {
             if ($index === $this->activeTab) {
-                // Active: bold, colored text, lighter background
                 $bar .= "\033[1;{$config['color']};48;5;239m {$config['key']} {$config['label']} \033[0m ";
             } else {
-                // Inactive: dim gray
                 $bar .= "\033[90m {$config['key']} {$config['label']} \033[0m ";
             }
         }

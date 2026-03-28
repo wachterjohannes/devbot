@@ -109,6 +109,11 @@ services:
             $reservedForResponse: 4000
             $reservedForTools: 8000
 
+    # Tool execution logger
+    App\EventListener\ToolExecutionLogger:
+        arguments:
+            $logFile: '%kernel.project_dir%/var/log/tool_calls.jsonl'
+
     # Memory injection processor
     App\Agent\Processor\MemoryInjectionProcessor:
         arguments:
