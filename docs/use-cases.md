@@ -208,3 +208,37 @@ A heartbeat skill that:
 2. Delegates to Claude Code (plan mode) for analysis
 3. Stores the review in memory via `memory_add`
 4. Creates a kanban card if issues were found
+
+## Headless Mode & Remote Access
+
+### V-Server Deployment
+
+Run DevBot continuously on a server without a terminal UI:
+
+```bash
+php bin/devbot run --headless
+```
+
+The heartbeat keeps running scheduled skills and tasks. Connect from any machine via the client.
+
+### Local Client
+
+```bash
+# Interactive chat
+php bin/devbot client
+
+# Single message (for scripts/automation)
+php bin/devbot client "Show me the kanban board"
+```
+
+### Remote Client via SSH
+
+```bash
+# Connect to DevBot running on a remote server
+php bin/devbot client --host user@my-server.com
+
+# Send a one-off command remotely
+php bin/devbot client --host user@my-server.com "Run the news digest skill"
+```
+
+The client establishes an SSH tunnel to forward the Unix socket, making remote access transparent. See [headless.md](headless.md) for deployment details.

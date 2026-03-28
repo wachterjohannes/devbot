@@ -14,7 +14,7 @@ php vendor/bin/php-cs-fixer fix     # Fix code style (PSR-12)
 
 ```
 src/
-├── Command/             # Console commands (DevBotCommand)
+├── Command/             # Console commands (DevBotCommand, ClientCommand)
 ├── Tui/                 # TUI application and widgets
 │   ├── App.php          # Root layout with tabbed views (F1/F2/F3/F4)
 │   └── Widget/          # ChatWidget, KanbanWidget, MemoryBrowserWidget, LogWidget, StatusBarWidget
@@ -55,6 +55,9 @@ src/
 │   ├── Heartbeat/       # 3 scheduled task tools (schedule, list, cancel)
 │   ├── CodingAgent/     # 1 Claude Code delegation tool
 │   └── Shell/           # 1 shell exec tool
+├── Server/              # Headless mode socket server
+│   ├── SocketServer.php       # Unix socket server (Revolt event loop)
+│   └── RequestHandler.php     # JSON request routing to agent
 ├── EventListener/       # Event listeners
 │   └── ToolExecutionLogger.php  # Logs tool calls to file + in-memory buffer
 └── Bridge/              # External service bridges

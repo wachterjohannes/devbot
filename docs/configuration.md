@@ -29,6 +29,7 @@ ai:
                 file: '%kernel.project_dir%/config/prompts/devbot_system.md'
                 include_tools: true
             tools: true
+            fault_tolerant_toolbox: true  # Continue on tool errors
 
     store:
         sqlite:

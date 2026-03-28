@@ -1173,7 +1173,7 @@ mcp:
 
 ### Phase 4: Telegram + Multi-Tab TUI (Week 7-8)
 
-**Status: Partial** -- Multi-tab TUI done (Chat/Board/Memory with F1/F2/F3 switching), ProfileLearner done. Missing: Telegram bridge, Telegram tools, approval flow, Logs tab.
+**Status: Partial** -- Multi-tab TUI done (Chat/Board/Memory/Logs with F1/F2/F3/F4 switching), ProfileLearner done, Logs tab done (LogWidget + ToolExecutionLogger). Missing: Telegram bridge, Telegram tools, approval flow.
 
 **Goal**: Full TUI with all tabs and Telegram integration.
 
@@ -1271,7 +1271,7 @@ mcp:
 
 ### Phase 7: Polish + Hardening (Week 13-14)
 
-**Status: Partial** -- Context window management done (ContextWindowManager + ContextTruncationProcessor), unit and integration tests written (86 tests). Missing: comprehensive error handling, full test coverage, V-Server deployment (systemd, headless mode is stub only), ARCHITECTURE.md.
+**Status: Partial** -- Context window management done (ContextWindowManager + ContextTruncationProcessor), unit and integration tests written (86 tests), headless mode fully implemented (SocketServer + RequestHandler + ClientCommand with SSH tunneling). Missing: comprehensive error handling, full test coverage, systemd service file, ARCHITECTURE.md.
 
 1. **Context window management**
    - Smart truncation strategy for long conversations

@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace App\Memory\Store;
 
 use App\Memory\Model\MemoryEntry;
-use App\Memory\Model\MemoryMetadata;
-use App\Memory\Model\MemoryType;
 use Symfony\AI\Store\Document\Metadata;
 use Symfony\AI\Store\Document\TextDocument;
-use Symfony\AI\Store\Document\VectorDocument;
 use Symfony\AI\Store\Document\VectorizerInterface;
 use Symfony\AI\Store\Query\TextQuery;
 use Symfony\AI\Store\StoreInterface;
@@ -17,6 +14,8 @@ use Symfony\AI\Store\StoreInterface;
 /**
  * Vector-indexed semantic store wrapping symfony/ai-sqlite-store.
  * All memory entries that are persisted get embedded and stored here for fuzzy/semantic search.
+ *
+ * Not final: tests mock this class directly since it wraps external store/vectorizer dependencies.
  */
 class SemanticStore
 {

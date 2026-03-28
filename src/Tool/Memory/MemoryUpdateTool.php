@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tool\Memory;
 
 use App\Memory\MemoryManager;
-use App\Memory\Model\MemoryMetadata;
 use Symfony\AI\Agent\Toolbox\Attribute\AsTool;
 
 /**
