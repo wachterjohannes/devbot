@@ -59,6 +59,13 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - KanbanManager for CRUD with automatic save
 - 4 kanban tools: kanban_list, kanban_create_card, kanban_move_card, kanban_update_card
 - 2 git tools: git_status (status/log/diff/branch), git_commit (stage + commit)
+
+### Phase 4 — Tabbed TUI
+- Tab bar with ANSI-colored DevBot logo and F1/F2/F3 switching
+- F1 Chat: streaming conversation with thinking token handling
+- F2 Board: kanban columns with cards, priorities, labels, WIP limits
+- F3 Memory: entry list with content viewer, auto-focus navigation
+
 ### Phase 5 — Skills + Heartbeat
 - Skill system: markdown-based reusable workflows the bot creates and runs
 - SkillParser/SkillManager for CRUD with index.json registry
@@ -74,6 +81,11 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 - Claude Code platform registered manually (no bundle config yet)
 - 26 total agent tools registered
 
+### Phase 7 — Polish
+- Memory lifecycle: SessionEndHandler (extract learnings at quit), GarbageCollector (time-decay + access boost)
+- Context window management: 128k token budget, auto-truncates old turns at 80% usage
+- Profile auto-learning: extracts preferences, tech context, role info from conversations
+
 ### Vendor Patches
 - `patches/ollama-ndjson-streaming.patch` — OllamaClient uses NdjsonHttpResult ([PR #1827](https://github.com/symfony/ai/pull/1827))
 - `patches/platform-ndjson-result.patch` — adds NdjsonHttpResult class for NDJSON streaming ([PR #1827](https://github.com/symfony/ai/pull/1827))
@@ -81,4 +93,4 @@ See [PLAN.md](PLAN.md) for full architecture, and [CLAUDE.md](CLAUDE.md) for dev
 
 ### Quality
 - PHPStan level 6: 0 errors
-- 72 tests (unit + integration) passing
+- 86 tests (unit + integration), 215 assertions
