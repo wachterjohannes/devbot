@@ -5,7 +5,7 @@
 
 ARG TARGETARCH=amd64
 
-FROM --platform=linux/${TARGETARCH} dunglas/frankenphp:static-builder-gnu AS builder
+FROM --platform=linux/${TARGETARCH} dunglas/frankenphp:static-builder AS builder
 
 WORKDIR /go/src/app/dist/app
 
@@ -14,8 +14,9 @@ COPY dist/app/ .
 
 WORKDIR /go/src/app/
 
-# Build with default extensions (auto-resolves all transitive dependencies)
+# Build with extensions we need (no curl — AmpHttpClient uses sockets directly)
 RUN EMBED=dist/app/ \
+    PHP_EXTENSIONS="ctype,dom,fileinfo,filter,iconv,intl,mbstring,opcache,openssl,pcntl,pdo,pdo_sqlite,posix,readline,session,simplexml,sockets,sqlite3,tokenizer,xml,xmlwriter,zip,zlib" \
     PHP_VERSION="8.4" \
     ./build-static.sh
 
