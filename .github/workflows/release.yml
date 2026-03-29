@@ -119,6 +119,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist/
+          pattern: devbot-*
           merge-multiple: true
 
       - name: Generate checksums
