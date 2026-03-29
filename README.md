@@ -6,18 +6,18 @@ AI-powered development process agent built on Symfony/TUI and Symfony/AI.
 
 ```bash
 # Download (Linux x86_64 — see Releases for other platforms)
-curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-x86_64
-chmod +x devbot
+curl -Lo devbot.tar.gz https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-x86_64.tar.gz
+tar xzf devbot.tar.gz
 
 # Prerequisites
 ollama pull kimi-k2.5:cloud
 ollama pull nomic-embed-text
 
 # Interactive setup (creates config, directories, vector store)
-./devbot php-cli bin/devbot setup
+./devbot setup
 
 # Run
-./devbot php-cli bin/devbot run
+./devbot run
 ```
 
 No PHP, Composer, or dependencies required -- everything is bundled via [FrankenPHP](https://frankenphp.dev).

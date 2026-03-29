@@ -59,18 +59,22 @@ This builds all platforms and creates a GitHub Release with the binaries and SHA
 
 ## Running the Standalone Binary
 
+Extract the tarball — it contains `devbot` (wrapper script) and `devbot-bin` (FrankenPHP runtime). Keep both in the same directory.
+
 ```bash
+tar xzf devbot-linux-x86_64.tar.gz
+
+# Setup (first run)
+./devbot setup
+
 # TUI mode
-./devbot php-cli bin/devbot run
+./devbot run
 
 # Headless mode
-./devbot php-cli bin/devbot run --headless
+./devbot run --headless
 
 # Client
-./devbot php-cli bin/devbot client --host user@server
-
-# Store setup (first run)
-./devbot php-cli bin/devbot ai:store:setup ai.store.sqlite.memory_store
+./devbot client --host user@server
 ```
 
 ## Environment Variables

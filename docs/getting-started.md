@@ -18,29 +18,28 @@ ollama pull nomic-embed-text   # Embedding model for memory search
 
 ## Option A: Standalone Binary (recommended)
 
-Download the latest release for your platform:
+Download and extract for your platform:
 
 ```bash
 # Linux x86_64
-curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-x86_64
+curl -Lo devbot.tar.gz https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-x86_64.tar.gz
 
 # Linux ARM64
-curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-arm64
+curl -Lo devbot.tar.gz https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-linux-arm64.tar.gz
 
 # macOS ARM64 (Apple Silicon)
-curl -Lo devbot https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-macos-arm64
+curl -Lo devbot.tar.gz https://github.com/wachterjohannes/devbot/releases/latest/download/devbot-macos-arm64.tar.gz
 
-chmod +x devbot
+tar xzf devbot.tar.gz
 ```
+
+This gives you `devbot` (wrapper) and `devbot-bin` (runtime). Keep them in the same directory.
 
 Run the interactive setup wizard:
 
 ```bash
-# Guided setup: configures .env.local, creates directories, initializes vector store
-./devbot php-cli bin/devbot setup
-
-# Run
-./devbot php-cli bin/devbot run
+./devbot setup
+./devbot run
 ```
 
 No PHP installation required -- everything is bundled in the binary.

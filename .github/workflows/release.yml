@@ -46,20 +46,23 @@ jobs:
           outputs: type=local,dest=dist/out
           no-cache: true
 
-      - name: Rename binary
+      - name: Package binary with wrapper
         run: |
-          mv dist/out/devbot dist/devbot-${{ matrix.suffix }}
-          chmod +x dist/devbot-${{ matrix.suffix }}
-          ls -lh dist/devbot-${{ matrix.suffix }}
+          mkdir -p dist/package
+          mv dist/out/devbot dist/package/devbot-bin
+          cp build/wrapper.sh dist/package/devbot
+          chmod +x dist/package/devbot dist/package/devbot-bin
+          cd dist/package && tar czf ../devbot-${{ matrix.suffix }}.tar.gz devbot devbot-bin
+          ls -lh dist/devbot-${{ matrix.suffix }}.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: devbot-${{ matrix.suffix }}
-          path: dist/devbot-${{ matrix.suffix }}
+          path: dist/devbot-${{ matrix.suffix }}.tar.gz
 
   build-macos:
-    runs-on: macos-14  # ARM64 runner
+    runs-on: macos-14
     name: Build macOS ARM64
     continue-on-error: true
 
@@ -94,17 +97,20 @@ jobs:
           PHP_VERSION="8.4" \
           ./build-static.sh
 
-      - name: Rename binary
+      - name: Package binary with wrapper
         run: |
-          cp /tmp/frankenphp/dist/frankenphp-mac-* dist/devbot-macos-arm64
-          chmod +x dist/devbot-macos-arm64
-          ls -lh dist/devbot-macos-arm64
+          mkdir -p dist/package
+          cp /tmp/frankenphp/dist/frankenphp-mac-* dist/package/devbot-bin
+          cp build/wrapper.sh dist/package/devbot
+          chmod +x dist/package/devbot dist/package/devbot-bin
+          cd dist/package && tar czf ../devbot-macos-arm64.tar.gz devbot devbot-bin
+          ls -lh dist/devbot-macos-arm64.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: devbot-macos-arm64
-          path: dist/devbot-macos-arm64
+          path: dist/devbot-macos-arm64.tar.gz
 
   release:
     needs: [build-linux]
@@ -125,7 +131,7 @@ jobs:
       - name: Generate checksums
         run: |
           cd dist
-          sha256sum devbot-* > checksums.txt
+          sha256sum devbot-*.tar.gz > checksums.txt
           cat checksums.txt
 
       - name: Create release
@@ -134,27 +140,26 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: false
           files: |
-            dist/devbot-linux-x86_64
-            dist/devbot-linux-arm64
-            dist/devbot-macos-arm64
+            dist/devbot-linux-x86_64.tar.gz
+            dist/devbot-linux-arm64.tar.gz
+            dist/devbot-macos-arm64.tar.gz
             dist/checksums.txt
           body: |
             ## Installation
 
-            Download the binary for your platform and make it executable:
+            Download and extract for your platform:
 
             ```bash
             # Linux x86_64
-            curl -Lo devbot https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/devbot-linux-x86_64
+            curl -Lo devbot.tar.gz https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/devbot-linux-x86_64.tar.gz
+            tar xzf devbot.tar.gz
 
             # Linux ARM64
-            curl -Lo devbot https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/devbot-linux-arm64
-
-            # macOS ARM64 (Apple Silicon)
-            curl -Lo devbot https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/devbot-macos-arm64
-
-            chmod +x devbot
+            curl -Lo devbot.tar.gz https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/devbot-linux-arm64.tar.gz
+            tar xzf devbot.tar.gz
             ```
+
+            This gives you two files: `devbot` (wrapper) and `devbot-bin` (runtime). Keep them in the same directory.
 
             ## Prerequisites
 
@@ -165,13 +170,9 @@ jobs:
             ## Quick Start
 
             ```bash
-            # Pull required models
             ollama pull kimi-k2.5:cloud
             ollama pull nomic-embed-text
 
-            # Interactive setup (config, directories, vector store)
-            ./devbot php-cli bin/devbot setup
-
-            # Run
-            ./devbot php-cli bin/devbot run
+            ./devbot setup
+            ./devbot run
             ```
