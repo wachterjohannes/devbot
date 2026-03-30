@@ -52,7 +52,7 @@ jobs:
           mv dist/out/devbot dist/package/devbot-bin
           cp build/wrapper.sh dist/package/devbot
           chmod +x dist/package/devbot dist/package/devbot-bin
-          cd dist/package && tar czf ../devbot-${{ matrix.suffix }}.tar.gz devbot devbot-bin
+          tar czf dist/devbot-${{ matrix.suffix }}.tar.gz -C dist/package devbot devbot-bin
           ls -lh dist/devbot-${{ matrix.suffix }}.tar.gz
 
       - name: Upload artifact
@@ -103,7 +103,7 @@ jobs:
           cp /tmp/frankenphp/dist/frankenphp-mac-* dist/package/devbot-bin
           cp build/wrapper.sh dist/package/devbot
           chmod +x dist/package/devbot dist/package/devbot-bin
-          cd dist/package && tar czf ../devbot-macos-arm64.tar.gz devbot devbot-bin
+          tar czf dist/devbot-macos-arm64.tar.gz -C dist/package devbot devbot-bin
           ls -lh dist/devbot-macos-arm64.tar.gz
 
       - name: Upload artifact
